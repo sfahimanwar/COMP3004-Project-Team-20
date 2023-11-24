@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>img/aed.jpg</file>
+        <file>img/dummy.jpg</file>
+        <file>img/child.jpg</file>
+        <file>img/normal.jpg</file>
+        <file>img/irregular.jpg</file>
+        <file>img/fast.jpg</file>
+        <file>img/slow.jpg</file>
+    </qresource>
+</RCC>
