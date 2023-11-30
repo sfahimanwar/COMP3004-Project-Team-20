@@ -106,9 +106,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>370</y>
+      <y>360</y>
       <width>371</width>
-      <height>221</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -126,7 +126,7 @@
        <x>10</x>
        <y>10</y>
        <width>351</width>
-       <height>201</height>
+       <height>211</height>
       </rect>
      </property>
      <property name="autoFillBackground">
@@ -218,8 +218,8 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
-       <width>111</width>
+       <y>40</y>
+       <width>61</width>
        <height>17</height>
       </rect>
      </property>
@@ -230,8 +230,8 @@ p, li { white-space: pre-wrap; }
     <widget class="QSpinBox" name="pulseSetBox">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>50</y>
+       <x>130</x>
+       <y>40</y>
        <width>45</width>
        <height>26</height>
       </rect>
@@ -274,7 +274,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>50</y>
+       <y>40</y>
        <width>111</width>
        <height>17</height>
       </rect>
@@ -287,7 +287,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>50</y>
+       <y>40</y>
        <width>41</width>
        <height>25</height>
       </rect>
@@ -303,10 +303,10 @@ p, li { white-space: pre-wrap; }
       </property>
      </item>
     </widget>
-    <widget class="QPushButton" name="pushButton_10">
+    <widget class="QPushButton" name="createPatientButton">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>10</x>
        <y>80</y>
        <width>83</width>
        <height>25</height>
@@ -314,6 +314,39 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>Set Patient</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="isBreathingBox">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>70</y>
+       <width>41</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>T</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>F</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="isResponsiveLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>70</y>
+       <width>91</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Is Breathing:</string>
      </property>
     </widget>
    </widget>
@@ -380,10 +413,10 @@ p, li { white-space: pre-wrap; }
    <widget class="QFrame" name="userActionsFrame">
     <property name="geometry">
      <rect>
-      <x>429</x>
-      <y>369</y>
+      <x>430</x>
+      <y>360</y>
       <width>341</width>
-      <height>221</height>
+      <height>281</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -477,33 +510,33 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>160</y>
        <width>171</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Check For Open Chest:</string>
+      <string>Clear Chest:</string>
      </property>
     </widget>
     <widget class="QPushButton" name="openChestButton">
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>100</y>
+       <y>160</y>
        <width>83</width>
        <height>25</height>
       </rect>
      </property>
      <property name="text">
-      <string>Check</string>
+      <string>Clear</string>
      </property>
     </widget>
     <widget class="QLabel" name="defibLabel">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>190</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -516,7 +549,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>130</y>
+       <y>190</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -529,7 +562,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>160</y>
+       <y>220</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -542,7 +575,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>160</y>
+       <y>220</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -555,7 +588,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>250</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -568,7 +601,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>190</y>
+       <y>250</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -577,12 +610,64 @@ p, li { white-space: pre-wrap; }
       <string>Shock!</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="openAirwaysButton">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>100</y>
+       <width>83</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Open</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="checkBreathingButton">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>130</y>
+       <width>83</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Check</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="checkBreathingLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>171</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Check For Breathing:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="openAirwaysLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>171</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Open Airways:</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QLabel" name="cprLabel">
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>600</y>
+      <y>650</y>
       <width>191</width>
       <height>17</height>
      </rect>
@@ -601,7 +686,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>620</y>
+      <y>670</y>
       <width>341</width>
       <height>61</height>
      </rect>
@@ -620,7 +705,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>20</x>
        <y>20</y>
-       <width>91</width>
+       <width>141</width>
        <height>25</height>
       </rect>
      </property>
@@ -631,9 +716,9 @@ p, li { white-space: pre-wrap; }
     <widget class="QPushButton" name="breathButton">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>180</x>
        <y>20</y>
-       <width>91</width>
+       <width>141</width>
        <height>25</height>
       </rect>
      </property>
@@ -710,7 +795,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="emergencyState">
@@ -726,7 +811,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="airwayState">
@@ -742,7 +827,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="breathState">
@@ -758,7 +843,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="padState">
@@ -774,7 +859,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="noTouchState">
@@ -790,7 +875,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="cprState">
@@ -806,7 +891,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QFrame" name="patientFrame">
