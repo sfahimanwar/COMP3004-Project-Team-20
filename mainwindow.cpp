@@ -89,6 +89,9 @@ void MainWindow::beginSimulation(){
 
     if (ui->bodyBox->currentText() == "Child"){
         body = 1;
+        ui->patientLabel->setPixmap(QPixmap(":/resources/img/child.jpg"));
+    }else{
+        ui->patientLabel->setPixmap(QPixmap(":/resources/img/dummy.jpg"));
     }
 
     if (ui->pulseEvenBox->currentText() == "T"){
