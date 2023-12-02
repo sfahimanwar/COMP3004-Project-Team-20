@@ -67,8 +67,8 @@
    <widget class="QLabel" name="patientTextLabel">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>0</y>
+      <x>790</x>
+      <y>320</y>
       <width>141</width>
       <height>17</height>
      </rect>
@@ -352,28 +352,35 @@ p, li { white-space: pre-wrap; }
     <widget class="QLabel" name="isResponsiveLabel_3">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>190</x>
        <y>100</y>
        <width>91</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Condition:</string>
+      <string>QRS Complex</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="conditionBox">
+    <widget class="QComboBox" name="qrs">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>300</x>
        <y>100</y>
-       <width>151</width>
+       <width>41</width>
        <height>25</height>
       </rect>
      </property>
-     <property name="currentText">
-      <string/>
-     </property>
+     <item>
+      <property name="text">
+       <string>T</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>F</string>
+      </property>
+     </item>
     </widget>
    </widget>
    <widget class="QLabel" name="userActionsLabel">
@@ -718,8 +725,8 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>150</y>
+      <x>850</x>
+      <y>480</y>
       <width>151</width>
       <height>23</height>
      </rect>
@@ -737,8 +744,8 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>230</y>
+      <x>940</x>
+      <y>560</y>
       <width>161</width>
       <height>23</height>
      </rect>
@@ -885,8 +892,8 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>20</y>
+      <x>790</x>
+      <y>350</y>
       <width>341</width>
       <height>241</height>
      </rect>
@@ -914,20 +921,17 @@ color: rgb(255, 255, 255);</string>
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="horizontalFrame">
+   <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>10</y>
-      <width>461</width>
-      <height>341</height>
+      <x>410</x>
+      <y>30</y>
+      <width>841</width>
+      <height>251</height>
      </rect>
     </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
+    <property name="text">
+     <string/>
     </property>
    </widget>
    <zorder>patientFrame</zorder>
@@ -952,7 +956,7 @@ color: rgb(255, 255, 255);</string>
    <zorder>padState</zorder>
    <zorder>noTouchState</zorder>
    <zorder>cprState</zorder>
-   <zorder>horizontalFrame</zorder>
+   <zorder>label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

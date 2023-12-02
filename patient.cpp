@@ -1,13 +1,54 @@
 #include "patient.h"
 
-Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool breathing, int c){
-    patientCondition = c;
+Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool breathing, bool q){
     body = b;
     pulse = p;
     isEven = even;
     isSafeRange = safeRange;
     isResponsive = response;
     isBreathing = breathing;
+    QRS = q;
+
+    //1 = VF
+    //2 = VT
+    //3 = PEA
+    //4 = Asystole
+
+    //5 = Normal
+
+    // asystole
+    if (pulse == 0) {
+        patientCondition = 3;
+        return;
+    }
+
+    if (isEven == true) {
+        if (QRS == true) {
+            patientCondition = 2;
+            return;
+        } else {
+            patientCondition = 1;
+            return;
+        }
+    } else {
+        patientCondition = 0;
+        return;
+    }
+
+    //cant get here i think (which is fine maybe?)
+    patientCondition = 4;
+    return;
+
+
+    //even pulse & under 120 = VT/PEA
+    //PEA has QRS (VT does not)
+
+    //VF = not even
+
+    //Else = normal
+
+
+
 }
 
 void Patient::receiveCPR(){
@@ -32,4 +73,8 @@ bool Patient::getResponsive(){
 
 bool Patient::getBreathing(){
     return isBreathing;
+}
+
+int Patient::getCondition() {
+    return patientCondition;
 }

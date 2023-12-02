@@ -5,9 +5,6 @@
 #include <aed.h>
 #include <patient.h>
 #include <QListWidgetItem>
-#include <QtCharts>
-#include <QChartView>
-#include <QLineSeries>
 #include <string>
 #include <QStack>
 
@@ -34,10 +31,6 @@ private:
     Patient* patient;
     Ui::MainWindow *ui;
     void updateTextbox(QString);
-    QChart *chart;
-    QLineSeries *series;
-    QChartView *chartView;
-    void initializeGraph();
 
 private slots:
     void beginSimulation();
