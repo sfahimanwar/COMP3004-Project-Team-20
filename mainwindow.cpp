@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include<unistd.h>
+
+
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -64,6 +68,12 @@ MainWindow::MainWindow(QWidget *parent)
     userButton = MainWindow::findChild<QPushButton *>("createPatientButton");
     connect(userButton, SIGNAL(released()), this, SLOT(beginSimulation()));
 
+    ui->conditionBox->addItem("No Issue");
+    ui->conditionBox->addItem("VF");
+    ui->conditionBox->addItem("VT");
+    ui->conditionBox->addItem("Not Shockable");
+
+
     //TODO: Connect CPR buttons
 
     updateTextbox("To begin using the AED, press the power button.");
@@ -71,16 +81,90 @@ MainWindow::MainWindow(QWidget *parent)
     ui->userActionsFrame->setDisabled(true);
     ui->aedAudioFrame->setDisabled(true);
     ui->cprFrame->setDisabled(true);
+
+
+//    series = new QLineSeries();
+//    chart = new QChart();
+//    //VT
+//    for (int i = 0; i < 1000; i = i + 40) {
+//        series->append(i + 0,50);
+//        series->append(i + 5,72.5);
+//        series->append(i + 10,75);
+//        series->append(i + 15,72.5);
+//        series->append(i + 20, 50);
+//        series->append(i + 25, 27.5);
+//        series->append(i + 30, 25);
+//        series->append(i + 35, 27.5);
+//    }
+////    series->append(0, 6);
+////    series->append(2, 4);
+////    series->append(3, 8);
+////    series->append(7, 4);
+////    series->append(10, 5);
+//    //*series << QPointF(11, 1) << QPointF(13, 3) << QPointF(17, 6) << QPointF(18, 3) << QPointF(20, 2);
+//    chart->legend()->hide();
+//    chart->addSeries(series);
+//    QValueAxis *xAxis = new QValueAxis;
+//    xAxis->setLabelFormat("%.0f");
+//    xAxis->setRange(0, 200);
+//    xAxis->setTitleText("Time (s)");
+//    QValueAxis *yAxis = new QValueAxis;
+//    yAxis->setLabelFormat("%.0f");
+//    yAxis->setRange(0, 100);
+//    yAxis->setTitleText("Heart Rate (bpm)");
+//    yAxis->setTickCount(6);
+//    chart->addAxis(xAxis, Qt::AlignBottom);
+//    chart->addAxis(yAxis, Qt::AlignLeft);
+//    series->attachAxis(xAxis);
+//    series->attachAxis(yAxis);
+//    chartView = new QChartView(chart);
+//    chartView->setRenderHint(QPainter::Antialiasing);
+//    chartView->resize(ui->horizontalFrame->size());
+//    chartView->setParent(ui->horizontalFrame);
 }
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+void MainWindow::initializeGraph(){
+//    series = new QLineSeries();
+//    chart = new QChart();
+//    chart->legend()->hide();
+//    chart->addSeries(series);
+//    QValueAxis *xAxis = new QValueAxis;
+//    xAxis->setLabelFormat("%.0f");
+//    xAxis->setRange(0, 60);
+//    xAxis->setTitleText("Time (s)");
+//    QValueAxis *yAxis = new QValueAxis;
+//    yAxis->setLabelFormat("%.0f");
+//    yAxis->setRange(70, 120);
+//    yAxis->setTitleText("Heart Rate (bpm)");
+//    yAxis->setTickCount(6);
+//    chart->addAxis(xAxis, Qt::AlignBottom);
+//    chart->addAxis(yAxis, Qt::AlignLeft);
+//    series->attachAxis(xAxis);
+//    series->attachAxis(yAxis);
+//    chartView = new QChartView(chart);
+//    chartView->setRenderHint(QPainter::Antialiasing);
+//    chartView->resize(ui->horizontalFrame->size());
+//    chartView->setParent(ui->horizontalFrame);
+}
+
+
+
+
+
+
+
+
 void MainWindow::beginSimulation(){
+
     // Get values from buttons to create patient and begin simulation
     int body = 0;
+    int condition = -1;
     int pulse = ui->pulseSetBox->value();
     bool pulseSafeRange = false;
     bool regPulse = false;
@@ -106,13 +190,24 @@ void MainWindow::beginSimulation(){
     if(ui->isBreathingBox->currentText() == "T"){
         breathing = true;
     }
+    if (ui->conditionBox->currentText() == "VF"){
+        condition = 0;
+    }
+    else if (ui->conditionBox->currentText() == "VT"){
+        condition = 1;
+    }
+    else if (ui->conditionBox->currentText() == "Not Shockable"){
+        condition = 2;
+    } else {
+        condition = 3;
+    }
 
-    patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing);
+    patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing, condition);
 
     ui->userActionsFrame->setEnabled(true);
     ui->aedAudioFrame->setEnabled(true);
 
-    qDebug() << "Created a patient with values body:" << body << "pulse:" << pulse << " pulseSafeRange" << pulseSafeRange << "regPulse:" << regPulse << "response:" << response << "breathing:" << breathing;
+    qDebug() << "Created a patient with values body:" << body << "pulse:" << pulse << " pulseSafeRange" << pulseSafeRange << "regPulse:" << regPulse << "response:" << response << "breathing:" << breathing << "condition" << condition;
     ui->configFrame->setDisabled(true);
 }
 
@@ -214,6 +309,8 @@ void MainWindow::applyPads(){
 
         ui->padState->setChecked(false);
         ui->noTouchState->setChecked(true);
+
+
     }else{
         updateTextbox("Defibrillator pads not attached!");
     }

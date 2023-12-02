@@ -1,7 +1,7 @@
 #include "patient.h"
 
-Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool breathing){
-    patientCondition = ventricularFibrillation; // TODO: Determine condition
+Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool breathing, int c){
+    patientCondition = c;
     body = b;
     pulse = p;
     isEven = even;

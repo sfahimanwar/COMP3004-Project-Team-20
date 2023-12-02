@@ -6,12 +6,14 @@
 class Patient
 {
 public:
-    Patient(int, int, bool, bool, bool, bool);
+    Patient(int, int, bool, bool, bool, bool, int);
     void receiveCPR();
     void receiveShock();
     enum condition {
       ventricularFibrillation,
-      ventricularTachycardia
+      ventricularTachycardia,
+      nonShockable,
+      none
     };
 
     enum bodyType {
@@ -25,7 +27,7 @@ public:
     bool getBreathing();
 
 private:
-    condition patientCondition;
+    int patientCondition;
     //bodyType body;
     int body;
     int pulse;

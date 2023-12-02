@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>890</height>
+    <width>1268</width>
+    <height>798</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -169,7 +169,7 @@ p, li { white-space: pre-wrap; }
       <x>30</x>
       <y>620</y>
       <width>371</width>
-      <height>111</height>
+      <height>131</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -307,7 +307,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>100</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -349,45 +349,30 @@ p, li { white-space: pre-wrap; }
       <string>Is Breathing:</string>
      </property>
     </widget>
-   </widget>
-   <widget class="QFrame" name="ecgFrame">
-    <property name="geometry">
-     <rect>
-      <x>429</x>
-      <y>270</y>
-      <width>341</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(222, 221, 218);</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QLabel" name="ecgLabel">
+    <widget class="QLabel" name="isResponsiveLabel_3">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>341</width>
-       <height>61</height>
+       <x>120</x>
+       <y>100</y>
+       <width>91</width>
+       <height>17</height>
       </rect>
      </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
      <property name="text">
-      <string/>
+      <string>Condition:</string>
      </property>
-     <property name="scaledContents">
-      <bool>true</bool>
+    </widget>
+    <widget class="QComboBox" name="conditionBox">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>100</y>
+       <width>151</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="currentText">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -395,7 +380,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>340</y>
+      <y>330</y>
       <width>191</width>
       <height>17</height>
      </rect>
@@ -414,7 +399,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>360</y>
+      <y>350</y>
       <width>341</width>
       <height>281</height>
      </rect>
@@ -866,7 +851,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>310</x>
-      <y>240</y>
+      <y>290</y>
       <width>191</width>
       <height>61</height>
      </rect>
@@ -929,6 +914,22 @@ color: rgb(255, 255, 255);</string>
      </property>
     </widget>
    </widget>
+   <widget class="QFrame" name="horizontalFrame">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>10</y>
+      <width>461</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
    <zorder>patientFrame</zorder>
    <zorder>aedAudioFrame</zorder>
    <zorder>aedDisplay</zorder>
@@ -937,7 +938,6 @@ color: rgb(255, 255, 255);</string>
    <zorder>aedAudioLabel</zorder>
    <zorder>configLabel</zorder>
    <zorder>configFrame</zorder>
-   <zorder>ecgFrame</zorder>
    <zorder>userActionsLabel</zorder>
    <zorder>userActionsFrame</zorder>
    <zorder>cprLabel</zorder>
@@ -952,13 +952,14 @@ color: rgb(255, 255, 255);</string>
    <zorder>padState</zorder>
    <zorder>noTouchState</zorder>
    <zorder>cprState</zorder>
+   <zorder>horizontalFrame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1268</width>
      <height>22</height>
     </rect>
    </property>
