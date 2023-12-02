@@ -7,5 +7,6 @@
         <file>img/irregular.jpg</file>
         <file>img/fast.jpg</file>
         <file>img/slow.jpg</file>
+        <file>img/ems.jpg</file>
     </qresource>
 </RCC>

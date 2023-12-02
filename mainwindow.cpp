@@ -1,13 +1,21 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QRandomGenerator>
+#include <QLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , emsArrived(false), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     ui->aedDisplay->setPixmap(QPixmap(":/resources/img/aed.jpg"));
+
+    ui->pulseSetBox->setMaximum(600); // Apparently the highest heart rate ever recorded (A good upper bound).
+
+    //EMS Setup
+    emsTimer.setSingleShot(true); // Timer will only fire once as EMS only needs to arrive just once
+    ui->emsResetButton->hide();
 
     //Can Set either Patient or Child Image using the code below
     /*
@@ -63,6 +71,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     userButton = MainWindow::findChild<QPushButton *>("createPatientButton");
     connect(userButton, SIGNAL(released()), this, SLOT(beginSimulation()));
+
+    //EMS Related Connections
+    connect(&emsTimer, SIGNAL(timeout()), this, SLOT(emsArrives()));
+    //Need to add EMS reset button functionality, will combine with base reset functionality when complete.
 
     //TODO: Connect CPR buttons
 
@@ -151,9 +163,21 @@ void MainWindow::checkResponse(){
 }
 
 void MainWindow::callEMS(){
+
+
     updateTextbox("EMS has been called, and will be arriving shortly!");
-    EMSTimer = 4;   //TODO: Make this random in a limited range
-    qDebug() << "EMSTimer has been set to" << EMSTimer;
+    int numMinutes = (QRandomGenerator::global()->generate() % 4)+ 2; // 2-5 minute wait time for EMS
+    emsTimer.start(numMinutes*60000);
+    qDebug() << "EMSTimer has been set to" << numMinutes << "Minutes";
+
+    //Setting up minute counter (Displays in console how long until EMS arrives (10 second intervals)
+    connect(&minuteCounter, &QTimer::timeout, [this]() { //Function is small so just put it inside of a lambda function
+        qDebug() << "Time until EMS arrives: " << (emsTimer.remainingTime()/1000) << "Seconds";
+        if(emsTimer.remainingTime()<=0){
+            minuteCounter.stop();
+        }
+    });
+    minuteCounter.start(10000);
 
     updateTextbox("Open the patient's airways.");
 
@@ -239,6 +263,33 @@ void MainWindow::performCPR(){
 
 void MainWindow::shock(){
     qDebug("In shock function!");
+}
+
+void MainWindow::emsArrives(){
+    //Hiding all elements
+    hideAll();
+
+    //Showing EMS elements
+    ui->emsArrivedLabel->setPixmap(QPixmap(":/resources/img/ems.jpg"));
+    ui->emsArrivedLabel->show();
+    ui->emsArrivedText->show();
+    ui->emsArrivedText->setText("EMS has arrived, Good Job!");
+    ui->emsResetButton->show();
+
+    emsArrived = true; // EMS Has arrived (Check during CPR functions)
+
+    qDebug() << "EMS Has Arrived, they will now take over CPR"; // Printing in console because AED window is only for it's audio.
+}
+
+void MainWindow::hideAll(){ // Helper function to just hide all elements that are children of the central widget (Essentially everything)
+    QObject* uiElement;
+    foreach(uiElement, ui->centralwidget->children()){
+        QWidget* uiWidget = qobject_cast<QWidget*>(uiElement);
+        if(uiWidget != nullptr){
+            qDebug() << uiWidget;
+            uiWidget->hide();
+        }
+    }
 }
 
 
