@@ -230,9 +230,9 @@ p, li { white-space: pre-wrap; }
     <widget class="QSpinBox" name="pulseSetBox">
      <property name="geometry">
       <rect>
-       <x>114</x>
+       <x>130</x>
        <y>40</y>
-       <width>61</width>
+       <width>45</width>
        <height>26</height>
       </rect>
      </property>
@@ -928,69 +928,12 @@ color: rgb(255, 255, 255);</string>
       <y>30</y>
       <width>841</width>
       <height>251</height>
-   <widget class="QLabel" name="emsArrivedText">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>340</y>
-      <width>311</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>DejaVu Sans</family>
-      <pointsize>14</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="emsArrivedLabel">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>151</x>
-      <y>26</y>
-      <width>491</width>
-      <height>301</height>
      </rect>
     </property>
     <property name="text">
      <string/>
     </property>
    </widget>
-    <property name="scaledContents">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="emsResetButton">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>370</y>
-      <width>83</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Reset</string>
-    </property>
-   </widget>
-   <zorder>emsResetButton</zorder>
-   <zorder>emsArrivedText</zorder>
-   <zorder>emsArrivedLabel</zorder>
    <zorder>patientFrame</zorder>
    <zorder>aedAudioFrame</zorder>
    <zorder>aedDisplay</zorder>
