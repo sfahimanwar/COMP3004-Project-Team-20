@@ -6,12 +6,15 @@
 class Patient
 {
 public:
-    Patient(int, int, bool, bool, bool, bool);
+    Patient(int, int, bool, bool, bool, bool, bool, int);
     void receiveCPR();
     void receiveShock();
     enum condition {
       ventricularFibrillation,
-      ventricularTachycardia
+      ventricularTachycardia,
+      PEA,
+      Asystole,
+      None
     };
 
     enum bodyType {
@@ -23,9 +26,12 @@ public:
     bool getSafeRange();
     bool getResponsive();
     bool getBreathing();
+    int getCondition();
+    bool getQRS();
+    int getPStrength();
 
 private:
-    condition patientCondition;
+    int patientCondition;
     //bodyType body;
     int body;
     int pulse;
@@ -33,6 +39,8 @@ private:
     bool isSafeRange;
     bool isResponsive;
     bool isBreathing;
+    bool QRS;
+    int pulseStrength;
 };
 
 #endif // PATIENT_H

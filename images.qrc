@@ -3,10 +3,11 @@
         <file>img/aed.jpg</file>
         <file>img/dummy.jpg</file>
         <file>img/child.jpg</file>
-        <file>img/normal.jpg</file>
-        <file>img/irregular.jpg</file>
-        <file>img/fast.jpg</file>
-        <file>img/slow.jpg</file>
         <file>img/ems.jpg</file>
+        <file>img/Asystole.png</file>
+        <file>img/normal.png</file>
+        <file>img/VF.png</file>
+        <file>img/VT.png</file>
+        <file>img/PEA.png</file>
     </qresource>
 </RCC>

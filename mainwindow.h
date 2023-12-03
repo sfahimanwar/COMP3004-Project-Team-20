@@ -29,6 +29,9 @@ private:
     Patient* patient;
     Ui::MainWindow *ui;
     void updateTextbox(QString);
+    void updateECG();
+    void setHighButtons(); //Helper function to set proper buttons that should appear if heart rate is high
+    void setNormalButtons(); //Helper function to set proper buttons that should appear if heart rate is within normal range
     void hideAll();
 
 private slots:
@@ -44,6 +47,7 @@ private slots:
     void shock();
     void performCPR();
     void emsArrives();
+    void updateFromOther();
 
 };
 #endif // MAINWINDOW_H
