@@ -6,7 +6,7 @@
 class Patient
 {
 public:
-    Patient(int, int, bool, bool, bool, bool, bool);
+    Patient(int, int, bool, bool, bool, bool, bool, int);
     void receiveCPR();
     void receiveShock();
     enum condition {
@@ -27,6 +27,8 @@ public:
     bool getResponsive();
     bool getBreathing();
     int getCondition();
+    bool getQRS();
+    int getPStrength();
 
 private:
     int patientCondition;
@@ -38,6 +40,7 @@ private:
     bool isResponsive;
     bool isBreathing;
     bool QRS;
+    int pulseStrength;
 };
 
 #endif // PATIENT_H

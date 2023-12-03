@@ -17,19 +17,13 @@ MainWindow::MainWindow(QWidget *parent)
     emsTimer.setSingleShot(true); // Timer will only fire once as EMS only needs to arrive just once
     ui->emsResetButton->hide();
 
-    //Can Set either Patient or Child Image using the code below
-    /*
-    ui->patientLabel->setPixmap(QPixmap(":/resources/img/child.jpg"));
-    ui->patientLabel->setPixmap(QPixmap(":/resources/img/dummy.jpg"));
-    */
-
-    //Can set ECG image using the code below
-    /*
-    ui->ecgLabel->setPixmap(QPixmap(":/resources/img/normal.jpg"));
-    ui->ecgLabel->setPixmap(QPixmap(":/resources/img/fast.jpg"));
-    ui->ecgLabel->setPixmap(QPixmap(":/resources/img/slow.jpg"));
-    ui->ecgLabel->setPixmap(QPixmap(":/resources/img/irregular.jpg"));
-    */
+    //Initial Patient Button Setup
+    connect(ui->pulseSetBox, SIGNAL(valueChanged(int)), this, SLOT(updateFromOther())); //All of these update the buttons available after changing one of their values
+    connect(ui->pulseEvenBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFromOther())); //This is because some states are dependant on others (Can't have VT if heart rate is 0)
+    connect(ui->pulseStrengthBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFromOther()));
+    connect(ui->hasQRSComplexBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFromOther()));
+    connect(ui->isBreathingBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFromOther()));
+    updateFromOther();
 
     this->aed = new AED();
 
@@ -99,6 +93,7 @@ void MainWindow::beginSimulation(){
     bool response = false;
     bool breathing = false;
     bool q = false;
+    int pulseStrength=0;
 
     if (ui->bodyBox->currentText() == "Child"){
         body = 1;
@@ -123,11 +118,15 @@ void MainWindow::beginSimulation(){
         breathing = true;
     }
 
-    if(ui->qrs->currentText() == "T"){
+    if(ui->hasQRSComplexBox->currentText() == "T"){
            q = true;
        }
 
-    patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing, q);
+    if(ui->pulseStrengthBox->currentText() == "Weak"){
+        pulseStrength = 1;
+    }
+
+    patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing, q, pulseStrength);
 
     ui->userActionsFrame->setEnabled(true);
     ui->aedAudioFrame->setEnabled(true);
@@ -234,6 +233,21 @@ void MainWindow::clearChest(){
 
 }
 
+void MainWindow::updateECG(){
+    int cond = patient->getCondition();
+     if (cond == 0) {
+         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/VF.png"));
+     } else if (cond == 1) {
+         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/VT.png"));
+     } else if (cond == 2) {
+         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/PEA.png"));
+     } else if (cond == 3) {
+         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/Asystole.png"));
+     } else {
+         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/normal.png"));
+     }
+}
+
 void MainWindow::applyPads(){
     bool electrode1 = ui->leftElectrode->isChecked();
     bool electrode2 = ui->rightElectrode->isChecked();
@@ -248,18 +262,7 @@ void MainWindow::applyPads(){
         ui->padState->setChecked(false);
         ui->noTouchState->setChecked(true);
 
-        int cond = patient->getCondition();
-         if (cond == 0) {
-             ui->label->setPixmap(QPixmap(":/resources/img/VF.png"));
-         } else if (cond == 1) {
-             ui->label->setPixmap(QPixmap(":/resources/img/VT.png"));
-         } else if (cond == 2) {
-             ui->label->setPixmap(QPixmap(":/resources/img/PEA.png"));
-         } else if (cond == 3) {
-             ui->label->setPixmap(QPixmap(":/resources/img/Asystole.png"));
-         } else {
-             ui->label->setPixmap(QPixmap(":/resources/img/normal.jpg"));
-         }
+        updateECG();
 
     }else{
         updateTextbox("Defibrillator pads not attached!");
@@ -309,6 +312,135 @@ void MainWindow::hideAll(){ // Helper function to just hide all elements that ar
             qDebug() << uiWidget;
             uiWidget->hide();
         }
+    }
+}
+
+void MainWindow::setHighButtons(){
+    ui->pulseEvenBox->setEnabled(true);
+    ui->responsivenessBox->setEnabled(true);
+    ui->isBreathingBox->setEnabled(true);
+    ui->hasQRSComplexBox->setEnabled(true);
+    ui->pulseStrengthBox->setEnabled(true);
+
+    if(ui->pulseStrengthBox->currentText() == "Weak"){ //Pulse Strength is weak, automatically PEA, disable other elements
+        ui->pulseEvenBox->setCurrentIndex(0);
+        ui->pulseEvenBox->setDisabled(true);
+        ui->responsivenessBox->setCurrentIndex(1); //If pulse strength is weak this implies the patient is unconscious
+        ui->responsivenessBox->setDisabled(true);
+        ui->isBreathingBox->setCurrentIndex(1); //If pulse strength is weak this implies the patient is not breathing
+        ui->isBreathingBox->setDisabled(true);
+        ui->hasQRSComplexBox->setCurrentIndex(0);
+        ui->hasQRSComplexBox->setDisabled(true);
+        return;
+    }
+    else{
+        ui->pulseEvenBox->setEnabled(true);
+        ui->responsivenessBox->setEnabled(true);
+        ui->isBreathingBox->setEnabled(true);
+        ui->hasQRSComplexBox->setEnabled(true);
+        ui->pulseStrengthBox->setEnabled(true);
+    }
+
+    if(ui->pulseEvenBox->currentText() == "F"){ //Pulse is not even, automatically VF (Rest of the values implied)
+        ui->responsivenessBox->setCurrentIndex(1);
+        ui->responsivenessBox->setDisabled(true);
+        ui->isBreathingBox->setCurrentIndex(1);
+        ui->isBreathingBox->setDisabled(true);
+        ui->hasQRSComplexBox->setCurrentIndex(1);
+        ui->hasQRSComplexBox->setDisabled(true);
+        return;
+    }
+    else{
+        ui->pulseEvenBox->setEnabled(true);
+        ui->responsivenessBox->setEnabled(true);
+        ui->isBreathingBox->setEnabled(true);
+        ui->hasQRSComplexBox->setEnabled(true);
+        ui->pulseStrengthBox->setEnabled(true);
+    }
+
+    if(ui->hasQRSComplexBox->currentText() == "F"){ //No QRS complex, automatically VT (Rest of values implied)
+        ui->responsivenessBox->setCurrentIndex(1);
+        ui->responsivenessBox->setDisabled(true);
+        ui->isBreathingBox->setCurrentIndex(1);
+        ui->isBreathingBox->setDisabled(true);
+        return;
+    }
+    else{
+        ui->pulseEvenBox->setEnabled(true);
+        ui->responsivenessBox->setEnabled(true);
+        ui->isBreathingBox->setEnabled(true);
+        ui->hasQRSComplexBox->setEnabled(true);
+        ui->pulseStrengthBox->setEnabled(true);
+    }
+
+    if(ui->isBreathingBox->currentText() == "F"){
+        ui->responsivenessBox->setCurrentIndex(1); //If patient is not breathing this implies they are unconscious
+        ui->responsivenessBox->setDisabled(true);
+        return;
+    }
+    else{
+        ui->pulseEvenBox->setEnabled(true);
+        ui->responsivenessBox->setEnabled(true);
+        ui->isBreathingBox->setEnabled(true);
+        ui->hasQRSComplexBox->setEnabled(true);
+        ui->pulseStrengthBox->setEnabled(true);
+    }
+
+}
+
+void MainWindow::setNormalButtons(){
+    ui->pulseEvenBox->setCurrentIndex(0); //Can't have a non-even pulse (VF) with a normal heart rate
+    ui->pulseEvenBox->setDisabled(true);
+    ui->responsivenessBox->setEnabled(true);
+    ui->isBreathingBox->setEnabled(true);
+    ui->hasQRSComplexBox->setCurrentIndex(0); //Can't not have a QRS complex (VT) with a normal heart rate
+    ui->hasQRSComplexBox->setDisabled(true);
+    ui->pulseStrengthBox->setEnabled(true);
+
+    if(ui->pulseStrengthBox->currentText() == "Weak"){ //Pulse Strength is weak, automatically PEA, disable other elements
+        ui->responsivenessBox->setCurrentIndex(1);
+        ui->responsivenessBox->setDisabled(true); //If pulse strength is weak this implies the patient is unconscious
+        ui->isBreathingBox->setCurrentIndex(1);
+        ui->isBreathingBox->setDisabled(true); //If pulse strength is weak this implies the patient is not breathing
+        return;
+    }
+    else{
+        ui->responsivenessBox->setEnabled(true);
+        ui->isBreathingBox->setEnabled(true);
+    }
+
+    if(ui->isBreathingBox->currentText() == "F"){
+        ui->responsivenessBox->setCurrentIndex(1); //If patient is not breathing this implies they are unconscious
+        ui->responsivenessBox->setDisabled(true);
+        return;
+    }
+    else{
+        ui->responsivenessBox->setEnabled(true);
+    }
+
+
+
+}
+
+void MainWindow::updateFromOther(){ //Initial button availability is based on heart rate of patient
+
+    if(ui->pulseSetBox->value() == 0){ //If Heart Rate is flatlined
+        ui->pulseEvenBox->setCurrentIndex(0);
+        ui->pulseEvenBox->setDisabled(true);
+        ui->responsivenessBox->setCurrentIndex(1);
+        ui->responsivenessBox->setDisabled(true);
+        ui->isBreathingBox->setCurrentIndex(1);
+        ui->isBreathingBox->setDisabled(true);
+        ui->hasQRSComplexBox->setCurrentIndex(1);
+        ui->hasQRSComplexBox->setDisabled(true);
+        ui->pulseStrengthBox->setCurrentIndex(1);
+        ui->pulseStrengthBox->setDisabled(true);
+    }
+    else if(ui->pulseSetBox->value()>=120){ //If Heart Rate is 120 or over (Now possible for VF and VT)
+        setHighButtons();
+    }
+    else{ //Heart rate between 0 and 120 (VF and VT not possible (But Normal and PEA still possible))
+        setNormalButtons();
     }
 }
 

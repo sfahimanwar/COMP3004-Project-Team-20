@@ -169,7 +169,7 @@ p, li { white-space: pre-wrap; }
       <x>30</x>
       <y>620</y>
       <width>371</width>
-      <height>151</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -310,7 +310,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>150</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -339,7 +339,7 @@ p, li { white-space: pre-wrap; }
       </property>
      </item>
     </widget>
-    <widget class="QLabel" name="isResponsiveLabel_2">
+    <widget class="QLabel" name="isBreathingLabel">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -352,7 +352,7 @@ p, li { white-space: pre-wrap; }
       <string>Is Breathing:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="isResponsiveLabel_3">
+    <widget class="QLabel" name="qrsLabel">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -365,7 +365,7 @@ p, li { white-space: pre-wrap; }
       <string>QRS Complex:</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="qrs">
+    <widget class="QComboBox" name="hasQRSComplexBox">
      <property name="geometry">
       <rect>
        <x>300</x>
@@ -385,14 +385,47 @@ p, li { white-space: pre-wrap; }
       </property>
      </item>
     </widget>
+    <widget class="QLabel" name="pulseLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>130</y>
+       <width>111</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pulse Strength:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="pulseStrengthBox">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>130</y>
+       <width>81</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Normal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Weak</string>
+      </property>
+     </item>
+    </widget>
    </widget>
    <widget class="QFrame" name="ecgFrame">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>620</y>
-      <width>341</width>
-      <height>61</height>
+      <x>420</x>
+      <y>170</y>
+      <width>711</width>
+      <height>161</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -404,28 +437,6 @@ p, li { white-space: pre-wrap; }
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLabel" name="ecgLabel">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>341</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
    </widget>
    <widget class="QLabel" name="userActionsLabel">
     <property name="geometry">
@@ -964,25 +975,6 @@ color: rgb(255, 255, 255);</string>
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="emsArrivedLabel">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>-280</x>
-       <y>-20</y>
-       <width>491</width>
-       <height>301</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
    </widget>
    <widget class="QLabel" name="emsArrivedText">
     <property name="enabled">
@@ -990,7 +982,7 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>270</x>
       <y>340</y>
       <width>311</width>
       <height>20</height>
@@ -1014,8 +1006,8 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>330</y>
+      <x>370</x>
+      <y>380</y>
       <width>83</width>
       <height>25</height>
      </rect>
@@ -1024,19 +1016,67 @@ color: rgb(255, 255, 255);</string>
      <string>Reset</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="emsArrivedLabel">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>30</y>
-      <width>891</width>
-      <height>271</height>
+      <x>170</x>
+      <y>20</y>
+      <width>491</width>
+      <height>301</height>
      </rect>
     </property>
     <property name="text">
      <string/>
     </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
    </widget>
+   <widget class="QLabel" name="ecgLabel">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>170</y>
+      <width>711</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ecgDiagramText">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>150</y>
+      <width>141</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>ECG Diagram</string>
+    </property>
+   </widget>
+   <zorder>emsArrivedLabel</zorder>
    <zorder>emsResetButton</zorder>
    <zorder>emsArrivedText</zorder>
    <zorder>patientFrame</zorder>
@@ -1062,7 +1102,8 @@ color: rgb(255, 255, 255);</string>
    <zorder>padState</zorder>
    <zorder>noTouchState</zorder>
    <zorder>cprState</zorder>
-   <zorder>label</zorder>
+   <zorder>ecgLabel</zorder>
+   <zorder>ecgDiagramText</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
