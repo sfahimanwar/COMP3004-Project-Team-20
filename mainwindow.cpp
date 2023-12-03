@@ -98,6 +98,7 @@ void MainWindow::beginSimulation(){
     bool regPulse = false;
     bool response = false;
     bool breathing = false;
+    bool q = false;
 
     if (ui->bodyBox->currentText() == "Child"){
         body = 1;
@@ -122,13 +123,19 @@ void MainWindow::beginSimulation(){
         breathing = true;
     }
 
-    patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing);
+    if(ui->qrs->currentText() == "T"){
+           q = true;
+       }
+
+    patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing, q);
 
     ui->userActionsFrame->setEnabled(true);
     ui->aedAudioFrame->setEnabled(true);
 
     qDebug() << "Created a patient with values body:" << body << "pulse:" << pulse << " pulseSafeRange" << pulseSafeRange << "regPulse:" << regPulse << "response:" << response << "breathing:" << breathing;
     ui->configFrame->setDisabled(true);
+
+
 }
 
 void MainWindow::updateTextbox(QString message){
@@ -228,7 +235,6 @@ void MainWindow::clearChest(){
 }
 
 void MainWindow::applyPads(){
-    // TODO: Display ECG reading once the pads are attached
     bool electrode1 = ui->leftElectrode->isChecked();
     bool electrode2 = ui->rightElectrode->isChecked();
     if (electrode1 && electrode2){
@@ -241,6 +247,20 @@ void MainWindow::applyPads(){
 
         ui->padState->setChecked(false);
         ui->noTouchState->setChecked(true);
+
+        int cond = patient->getCondition();
+         if (cond == 0) {
+             ui->label->setPixmap(QPixmap(":/resources/img/VF.png"));
+         } else if (cond == 1) {
+             ui->label->setPixmap(QPixmap(":/resources/img/VT.png"));
+         } else if (cond == 2) {
+             ui->label->setPixmap(QPixmap(":/resources/img/PEA.png"));
+         } else if (cond == 3) {
+             ui->label->setPixmap(QPixmap(":/resources/img/Asystole.png"));
+         } else {
+             ui->label->setPixmap(QPixmap(":/resources/img/normal.jpg"));
+         }
+
     }else{
         updateTextbox("Defibrillator pads not attached!");
     }

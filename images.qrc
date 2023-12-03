@@ -8,5 +8,9 @@
         <file>img/fast.jpg</file>
         <file>img/slow.jpg</file>
         <file>img/ems.jpg</file>
+        <file>img/Asystole.png</file>
+        <file>img/PEA.png</file>
+        <file>img/VF.png</file>
+        <file>img/VT.png</file>
     </qresource>
 </RCC>
