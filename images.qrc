@@ -11,6 +11,7 @@
         <file>img/PEA.png</file>
         <file>img/VF.png</file>
         <file>img/VT.png</file>
+        <file>img/ems.jpg</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

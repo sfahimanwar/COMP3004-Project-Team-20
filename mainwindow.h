@@ -7,8 +7,7 @@
 #include <QListWidgetItem>
 #include <string>
 #include <QStack>
-
-
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,7 +22,9 @@ public:
     ~MainWindow();
 
 private:
-    int EMSTimer;
+    QTimer emsTimer;
+    QTimer minuteCounter;
+    bool emsArrived;
     int numCompressions;
     int CPRQuality;
     bool isTouching;
@@ -31,6 +32,7 @@ private:
     Patient* patient;
     Ui::MainWindow *ui;
     void updateTextbox(QString);
+    void hideAll();
 
 private slots:
     void beginSimulation();
@@ -44,6 +46,7 @@ private slots:
     void moveAway();
     void shock();
     void performCPR();
+    void emsArrives();
 
 };
 #endif // MAINWINDOW_H
