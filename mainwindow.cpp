@@ -27,61 +27,102 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->aed = new AED();
 
-    QPushButton* userButton;
-    userButton = MainWindow::findChild<QPushButton *>("attachDefibButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(applyPads()));
-    userButton->setDisabled(true);
+    // Connects all user action buttons
+    connect(ui->powerButton, SIGNAL(released()), this, SLOT(powerOn()));
+    connect(ui->responsivenessButton, SIGNAL(released()), this, SLOT(checkResponse()));
+    connect(ui->helpButton, SIGNAL(released()), this, SLOT(callEMS()));
+    connect(ui->openAirwaysButton, SIGNAL(released()), this, SLOT(openAirways()));
+    connect(ui->checkBreathingButton, SIGNAL(released()), this, SLOT(checkBreathing()));
+    connect(ui->openChestButton, SIGNAL(released()), this, SLOT(clearChest()));
+    connect(ui->attachDefibButton, SIGNAL(released()), this, SLOT(applyPads()));
+    connect(ui->moveBackButton, SIGNAL(released()), this, SLOT(moveAway()));
+    connect(ui->shockButton, SIGNAL(released()), this, SLOT(shock()));
+    connect(ui->createPatientButton, SIGNAL(released()), this, SLOT(beginSimulation()));
 
-    userButton = MainWindow::findChild<QPushButton *>("helpButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(callEMS()));
-    userButton->setDisabled(true);
+    // CPR buttons
+    connect(ui->compressionButton, SIGNAL(released()), this, SLOT(performCPR()));
+    connect(ui->breathButton, SIGNAL(released()), this, SLOT(performCPR()));
 
-    userButton = MainWindow::findChild<QPushButton *>("moveBackButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(moveAway()));
-    userButton->setDisabled(true);
+    // Reset buttons
+    connect(ui->emsResetButton, SIGNAL(released()), this, SLOT(reset()));
+    connect(ui->resetButton, SIGNAL(released()), this, SLOT(reset()));
 
-    userButton = MainWindow::findChild<QPushButton *>("openChestButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(clearChest()));
-    userButton->setDisabled(true);
+    // Disables all user action buttons
+    ui->powerButton->setDisabled(true);
+    ui->responsivenessButton->setDisabled(true);
+    ui->helpButton->setDisabled(true);
+    ui->openAirwaysButton->setDisabled(true);
+    ui->checkBreathingButton->setDisabled(true);
+    ui->openChestButton->setDisabled(true);
+    ui->attachDefibButton->setDisabled(true);
+    ui->moveBackButton->setDisabled(true);
+    ui->shockButton->setDisabled(true);
 
-    userButton = MainWindow::findChild<QPushButton *>("powerButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(powerOn()));
-
-    userButton = MainWindow::findChild<QPushButton *>("responsivenessButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(checkResponse()));
-    userButton->setDisabled(true);
-
-    userButton = MainWindow::findChild<QPushButton *>("openAirwaysButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(openAirways()));
-    userButton->setDisabled(true);
-
-    userButton = MainWindow::findChild<QPushButton *>("checkBreathingButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(checkBreathing()));
-    userButton->setDisabled(true);
-
-    userButton = MainWindow::findChild<QPushButton *>("shockButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(shock()));
-    userButton->setDisabled(true);
-
-    userButton = MainWindow::findChild<QPushButton *>("createPatientButton");
-    connect(userButton, SIGNAL(released()), this, SLOT(beginSimulation()));
 
     //EMS Related Connections
     connect(&emsTimer, SIGNAL(timeout()), this, SLOT(emsArrives()));
     //Need to add EMS reset button functionality, will combine with base reset functionality when complete.
 
-    //TODO: Connect CPR buttons
-
     updateTextbox("To begin using the AED, press the power button.");
 
     ui->userActionsFrame->setDisabled(true);
     ui->aedAudioFrame->setDisabled(true);
+    ui->aedDisplayFrame->setDisabled(true);
     ui->cprFrame->setDisabled(true);
+    ui->patientFrame->setDisabled(true);
+    ui->ecgFrame->setDisabled(true);
+    ui->configFrame->setEnabled(true);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::reset(){
+    ui->aedText->clear();
+    showAll();
+
+    // Hide all "EMS arrived" elements
+    ui->emsResetButton->hide();
+    ui->emsArrivedLabel->hide();
+    ui->emsArrivedText->hide();
+
+    ui->patientLabel->setPixmap(QPixmap()); // Reset patient image
+    ui->ecgLabel->setPixmap(QPixmap());     // Reset ECG reading
+
+    // Disable all frames but the config
+    ui->userActionsFrame->setDisabled(true);
+    ui->aedAudioFrame->setDisabled(true);
+    ui->aedDisplayFrame->setDisabled(true);
+    ui->cprFrame->setDisabled(true);
+    ui->patientFrame->setDisabled(true);
+    ui->ecgFrame->setDisabled(true);
+    ui->configFrame->setEnabled(true);
+
+    // Disable all user action buttons
+    QObject* uiElement;
+    foreach(uiElement, ui->userActionsFrame->children()){
+        QWidget* uiWidget = qobject_cast<QWidget*>(uiElement);
+        if(uiWidget != nullptr){
+            uiWidget->setDisabled(true);
+        }
+    }
+
+    // Disable all radio buttons
+    foreach(uiElement, ui->aedDisplayFrame->children()){
+        QRadioButton* aedLights = qobject_cast<QRadioButton*>(uiElement);
+        if(aedLights != nullptr){
+            aedLights->setChecked(false);
+        }
+    }
+    // These buttons sit on their own so I elected to just uncheck/disable them manually instead of using a foreach loop like the above
+    ui->leftElectrode->setChecked(false);
+    ui->leftElectrode->setDisabled(true);
+    ui->rightElectrode->setChecked(false);
+    ui->rightElectrode->setDisabled(true);
+
+    emsTimer.stop();
 }
 
 void MainWindow::beginSimulation(){
@@ -94,6 +135,10 @@ void MainWindow::beginSimulation(){
     bool breathing = false;
     bool q = false;
     int pulseStrength=0;
+
+    ui->powerButton->setEnabled(true);
+    ui->patientFrame->setEnabled(true);
+    ui->aedDisplayFrame->setEnabled(true);
 
     if (ui->bodyBox->currentText() == "Child"){
         body = 1;
@@ -215,6 +260,7 @@ void MainWindow::checkBreathing(){
     ui->openChestButton->setEnabled(true);
 
     ui->breathState->setChecked(false);
+    ui->padState->setChecked(true);
 
 }
 
@@ -274,6 +320,7 @@ void MainWindow::moveAway(){
     updateTextbox("Prepare to administer CPR [CPR INSTRUCTIONS HERE]");
 
     ui->moveBackButton->setDisabled(true);
+    ui->shockButton->setEnabled(true);
     ui->cprFrame->setEnabled(true);
 
     ui->noTouchState->setChecked(false);
@@ -281,6 +328,11 @@ void MainWindow::moveAway(){
 }
 
 void MainWindow::performCPR(){
+    if(QObject::sender()->objectName() == "compressionButton"){
+        qDebug() << "TODO: Behaviour for pushing compression button";
+    }else{
+        qDebug() << "TODO: Behaviour for pushing breath button";
+    }
     qDebug("In performCPR function!");
 }
 
@@ -311,6 +363,16 @@ void MainWindow::hideAll(){ // Helper function to just hide all elements that ar
         if(uiWidget != nullptr){
             qDebug() << uiWidget;
             uiWidget->hide();
+        }
+    }
+}
+
+void MainWindow::showAll(){  // Helper function to show all elements
+    QObject* uiElement;
+    foreach(uiElement, ui->centralwidget->children()){
+        QWidget* uiWidget = qobject_cast<QWidget*>(uiElement);
+        if(uiWidget != nullptr){
+            uiWidget->show();
         }
     }
 }
@@ -443,7 +505,6 @@ void MainWindow::updateFromOther(){ //Initial button availability is based on he
         setNormalButtons();
     }
 }
-
 
 
 

@@ -33,8 +33,10 @@ private:
     void setHighButtons(); //Helper function to set proper buttons that should appear if heart rate is high
     void setNormalButtons(); //Helper function to set proper buttons that should appear if heart rate is within normal range
     void hideAll();
+    void showAll();
 
 private slots:
+    void reset();
     void beginSimulation();
     void powerOn();
     void checkResponse();
