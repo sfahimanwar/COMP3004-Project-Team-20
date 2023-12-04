@@ -218,7 +218,7 @@ void MainWindow::callEMS(){
 
     updateTextbox("EMS has been called, and will be arriving shortly!");
     int numMinutes = (QRandomGenerator::global()->generate() % 4)+ 2; // 2-5 minute wait time for EMS
-    emsTimer.start(numMinutes*6000);
+    emsTimer.start(numMinutes*60000);
     qDebug() << "EMSTimer has been set to" << numMinutes << "Minutes";
 
     //Setting up minute counter (Displays in console how long until EMS arrives (10 second intervals)
