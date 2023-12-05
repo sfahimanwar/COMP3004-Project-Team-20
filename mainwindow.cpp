@@ -4,6 +4,7 @@
 #include <QRandomGenerator>
 #include <QLayout>
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , emsArrived(false), ui(new Ui::MainWindow)
@@ -72,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->patientFrame->setDisabled(true);
     ui->ecgFrame->setDisabled(true);
     ui->configFrame->setEnabled(true);
+
 }
 
 MainWindow::~MainWindow()
@@ -124,6 +126,8 @@ void MainWindow::reset(){
 
     emsTimer.stop();
 }
+
+
 
 void MainWindow::beginSimulation(){
     // Get values from buttons to create patient and begin simulation
@@ -186,7 +190,38 @@ void MainWindow::updateTextbox(QString message){
     ui->aedText->append(message);
 }
 
+
+bool MainWindow::selfCheck() {
+    battery = ui->batteryConfig->value();
+    if (battery == 0) {
+        updateTextbox("AED did not power on");
+        return false;
+    } else if (battery < 20) {
+        updateTextbox("AED Audio: Low Battery");
+        if(ui->electrodes->currentText() == "T"){
+            return true;
+        } else {
+            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
+            return false;
+        }
+        if(ui->electrodes->currentText() == "T"){
+            return true;
+        } else {
+            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
+            return false;
+        }
+    } else {
+        return true;
+    }
+}
+
+
+
+
 void MainWindow::powerOn(){
+    if (selfCheck()) {
+
+
     updateTextbox("The AED has been powered on!");
     updateTextbox("Check the responsiveness of the patient.");
 
@@ -194,6 +229,9 @@ void MainWindow::powerOn(){
     ui->responsivenessButton->setEnabled(true);
 
     ui->okState->setChecked(true);
+    } else {
+
+    }
 }
 
 void MainWindow::checkResponse(){
@@ -325,19 +363,70 @@ void MainWindow::moveAway(){
 
     ui->noTouchState->setChecked(false);
     ui->cprState->setChecked(true);
+    ui->shockButton->setEnabled(false);
 }
+
+
+
+
+
 
 void MainWindow::performCPR(){
-    if(QObject::sender()->objectName() == "compressionButton"){
-        qDebug() << "TODO: Behaviour for pushing compression button";
-    }else{
-        qDebug() << "TODO: Behaviour for pushing breath button";
+    std::string idealBreaths;
+    for(int i = 0; i < NUM_BREATHS; i++) {
+        idealBreaths += "1";
     }
-    qDebug("In performCPR function!");
+    std::string idealCompressions;
+    for(int i = 0; i < NUM_COMPRESSIONS; i++) {
+        idealCompressions += "0";
+    }
+
+    if(QObject::sender()->objectName() == "compressionButton"){
+        cprString.append("0");
+        compressionsCount = compressionsCount + 1;
+    }else{
+        cprString.append("1");
+        breathsCount = breathsCount + 1;
+    }
+    std::string idealString =  idealCompressions + idealBreaths + idealCompressions + idealBreaths;
+    qDebug() << "CPRSTRING " << QString::fromStdString(cprString) << " IDEAL STRING " << QString::fromStdString(idealString);
+
+    if ((breathsCount + compressionsCount) == (NUM_BREATHS + NUM_COMPRESSIONS)*2) {
+        if (cprString == idealString) {
+            qDebug() << "GOOD CPR";
+        } else {
+            qDebug() << "BAD CPR";
+
+        }
+        breathsCount = 0;
+        compressionsCount = 0;
+        cprString = "";
+        if ((patient->getCondition() == 0) || (patient->getCondition() == 1)) {
+            updateTextbox("AED Audio: Shock advised");
+            ui->compressionButton->setEnabled(false);
+            ui->breathButton->setEnabled(false);
+            ui->shockButton->setEnabled(true);
+        } else {
+            updateTextbox("AED Audio: Shock not advised, continue cpr");
+        }
+
+    }
 }
 
+
 void MainWindow::shock(){
-    qDebug("In shock function!");
+    if (battery >= 10) {
+        ui->compressionButton->setEnabled(true);
+        ui->breathButton->setEnabled(true);
+        ui->shockButton->setEnabled(false);
+        updateTextbox("AED Audio: Shock delivered, continue cpr");
+        battery = battery - 10;
+    } else {
+        updateTextbox("AED Audio: Battery low, shock not delivered");
+        ui->compressionButton->setEnabled(true);
+        ui->breathButton->setEnabled(true);
+        ui->shockButton->setEnabled(false);
+    }
 }
 
 void MainWindow::emsArrives(){
