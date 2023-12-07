@@ -1181,6 +1181,64 @@ color: rgb(255, 255, 255);</string>
      <string>Reset simulation</string>
     </property>
    </widget>
+   <widget class="QFrame" name="infoFrame">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>670</y>
+      <width>341</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(222, 221, 218);</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <widget class="QLabel" name="batteryLabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>191</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remaining battery: ---</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="emsTimeLabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>311</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Time until EMS arrives: --- seconds</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="numShocksLabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>191</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Number of shocks: -</string>
+     </property>
+    </widget>
+   </widget>
    <zorder>aedDisplayFrame</zorder>
    <zorder>emsResetButton</zorder>
    <zorder>emsArrivedText</zorder>
@@ -1200,6 +1258,7 @@ color: rgb(255, 255, 255);</string>
    <zorder>ecgDiagramText</zorder>
    <zorder>emsArrivedLabel</zorder>
    <zorder>resetButton</zorder>
+   <zorder>infoFrame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

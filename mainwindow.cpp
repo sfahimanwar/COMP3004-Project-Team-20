@@ -73,6 +73,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->patientFrame->setDisabled(true);
     ui->ecgFrame->setDisabled(true);
     ui->configFrame->setEnabled(true);
+    ui->infoFrame->setDisabled(true);
+
+    QString compressions('c');
+    QString breaths('B');
+    compressions = compressions.repeated(NUM_COMPRESSIONS);
+    breaths = breaths.repeated(NUM_BREATHS);
+    idealPattern = compressions + breaths + compressions + breaths;
+    qDebug() << "idealPattern:" << idealPattern;
 
 }
 
@@ -101,6 +109,12 @@ void MainWindow::reset(){
     ui->patientFrame->setDisabled(true);
     ui->ecgFrame->setDisabled(true);
     ui->configFrame->setEnabled(true);
+    ui->infoFrame->setDisabled(true);
+
+    ui->emsTimeLabel->setText("Time until EMS arrives: --- seconds");
+    ui->batteryLabel->setText("Remaining battery: ---");
+    ui->numShocksLabel->setText("Number of shocks: -");
+
 
     // Disable all user action buttons
     QObject* uiElement;
@@ -124,7 +138,7 @@ void MainWindow::reset(){
     ui->rightElectrode->setChecked(false);
     ui->rightElectrode->setDisabled(true);
 
-    emsTimer.stop();
+    emsTimer.stop();    //TODO: KNOWN ISSUE: If the timer is going, and the user hits "reset," everything will reset correctly but after a few seconds the ems timer will update anyway and display 0.
 }
 
 
@@ -143,6 +157,7 @@ void MainWindow::beginSimulation(){
     ui->powerButton->setEnabled(true);
     ui->patientFrame->setEnabled(true);
     ui->aedDisplayFrame->setEnabled(true);
+    ui->infoFrame->setEnabled(true);
 
     if (ui->bodyBox->currentText() == "Child"){
         body = 1;
@@ -181,6 +196,7 @@ void MainWindow::beginSimulation(){
     ui->aedAudioFrame->setEnabled(true);
 
     qDebug() << "Created a patient with values body:" << body << "pulse:" << pulse << " pulseSafeRange" << pulseSafeRange << "regPulse:" << regPulse << "response:" << response << "breathing:" << breathing;
+    qDebug() << "Patient condition is" << patient->getCondition();
     ui->configFrame->setDisabled(true);
 
 
@@ -193,6 +209,9 @@ void MainWindow::updateTextbox(QString message){
 
 bool MainWindow::selfCheck() {
     battery = ui->batteryConfig->value();
+
+    ui->batteryLabel->setText("Battery %: " + QString::number(battery));
+
     if (battery == 0) {
         updateTextbox("AED did not power on");
         return false;
@@ -214,8 +233,6 @@ bool MainWindow::selfCheck() {
         return true;
     }
 }
-
-
 
 
 void MainWindow::powerOn(){
@@ -252,16 +269,16 @@ void MainWindow::checkResponse(){
 }
 
 void MainWindow::callEMS(){
-
-
     updateTextbox("EMS has been called, and will be arriving shortly!");
     int numMinutes = (QRandomGenerator::global()->generate() % 4)+ 2; // 2-5 minute wait time for EMS
     emsTimer.start(numMinutes*60000);
+    ui->emsTimeLabel->setText("Time until EMS arrives: " + QString::number(emsTimer.remainingTime()/1000) + " seconds");
     qDebug() << "EMSTimer has been set to" << numMinutes << "Minutes";
 
     //Setting up minute counter (Displays in console how long until EMS arrives (10 second intervals)
     connect(&minuteCounter, &QTimer::timeout, [this]() { //Function is small so just put it inside of a lambda function
         qDebug() << "Time until EMS arrives: " << (emsTimer.remainingTime()/1000) << "Seconds";
+        ui->emsTimeLabel->setText("Time until EMS arrives: " + QString::number(emsTimer.remainingTime()/1000) + " seconds");
         if(emsTimer.remainingTime()<=0){
             minuteCounter.stop();
         }
@@ -354,8 +371,9 @@ void MainWindow::applyPads(){
 }
 
 void MainWindow::moveAway(){
-    isTouching = false;
-    updateTextbox("Prepare to administer CPR [CPR INSTRUCTIONS HERE]");
+    updateTextbox("Prepare to administer CPR!");
+    updateTextbox("Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths.");
+    updateTextbox("Repeat the pattern twice, and then wait for AED assessment.");
 
     ui->moveBackButton->setDisabled(true);
     ui->shockButton->setEnabled(true);
@@ -367,49 +385,90 @@ void MainWindow::moveAway(){
 }
 
 
-
-
-
-
 void MainWindow::performCPR(){
-    std::string idealBreaths;
-    for(int i = 0; i < NUM_BREATHS; i++) {
-        idealBreaths += "1";
-    }
-    std::string idealCompressions;
-    for(int i = 0; i < NUM_COMPRESSIONS; i++) {
-        idealCompressions += "0";
-    }
+    int idealLength = 2*NUM_COMPRESSIONS + 2*NUM_BREATHS;
+    int cprCycleLength = cprString.length();
+    cprQuality = 0;
+
+    /* As the user performs CPR (presses the compression/breath) buttons, signals are sent to this function which are then used to build a QString called
+     * cprString. When cprString's length is equal to idealLength, the CPR cycle is considered "finished," the patient can be analyzed, and feedback on
+     * CPR is provided.
+     *
+     * CPR is rated as good/ok/poor as an integer from 0 to 3 depending on if the CPR meets the following conditions:
+     *  - 2 breaths are administered in the middle and 2 at the end
+     *  - There is a reasonable number of compressions administered (NUMCOMPRESSIONS ±1)
+     *  - There is a reasonable number of breaths administered (NUMBREATHS ±1)
+     *
+     * Examples:
+     *      ccccBBccccBB = quality 3/GOOD (Ideal)
+     *      cBccBBccccBB = quality 3/GOOD (extra breath, but within acceptable wiggle room to still be considered good CPR)
+     *      ccccBBcBcccB = quality 2/OKAY (correct number of breaths, missing breaths at the end)
+     *      ccccBBcBBcBB = quality 1/POOR (two extra breaths, not within acceptable wiggle room to be considered ok CPR)
+     *      ccBBcBcBBBcc = quality 0/POOR (Missing middle and end breaths, too many breaths, too few compressions)
+     *
+     * If you want to "increase the realism" you can change NUMCOMPRESSIONS in mainwindow.h to 30 which is more accurate to real life, but a huge pain
+     * since you gotta press the buttons 64 times per cycle. However, this function is designed to handle those changes, so if you love pressing buttons, you can.
+     */
+
 
     if(QObject::sender()->objectName() == "compressionButton"){
-        cprString.append("0");
-        compressionsCount = compressionsCount + 1;
+        cprString.append("c");
     }else{
-        cprString.append("1");
-        breathsCount = breathsCount + 1;
+        cprString.append("B");
     }
-    std::string idealString =  idealCompressions + idealBreaths + idealCompressions + idealBreaths;
-    qDebug() << "CPRSTRING " << QString::fromStdString(cprString) << " IDEAL STRING " << QString::fromStdString(idealString);
 
-    if ((breathsCount + compressionsCount) == (NUM_BREATHS + NUM_COMPRESSIONS)*2) {
-        if (cprString == idealString) {
-            qDebug() << "GOOD CPR";
-        } else {
-            qDebug() << "BAD CPR";
-
+    // Cycle considered "finished," AED will analyze patient and provide feedback
+    if(cprCycleLength + 1 == idealLength){
+        qDebug() << "Checking cpr quality: your string is" << cprString << "and the ideal string is" << idealPattern;
+        if(cprString[NUM_COMPRESSIONS] == 'B' && cprString[NUM_COMPRESSIONS + 1] == 'B' && cprString[2*NUM_COMPRESSIONS+2] == 'B' && cprString[2*NUM_COMPRESSIONS +3] == 'B'){    //breaths in correct spots
+            qDebug() << "gained 1 quality for proper breath ordering";
+            cprQuality++;
         }
-        breathsCount = 0;
-        compressionsCount = 0;
+
+        QChar c;
+        int numCompressions = 0;
+        int numBreaths = 0;
+        foreach(c, cprString){
+            if(c == 'c'){
+                numCompressions++;
+            }if(c == 'B'){
+                numBreaths++;
+            }
+        }
+
+        if(2*NUM_COMPRESSIONS-1 <= numCompressions && numCompressions <= 2*NUM_COMPRESSIONS+1){
+            cprQuality++;
+            qDebug() << "gained 1 quality for acceptable compressions amount";
+        }
+
+        if(2*NUM_BREATHS-1 <= numBreaths && numBreaths <= 2*NUM_BREATHS+1){
+            cprQuality++;
+            qDebug() << "gained 1 quality for acceptable breaths amount";
+        }
+
+        qDebug() << "This round of CPR has a quality rating of" << cprQuality;
         cprString = "";
+
+
+        updateTextbox("Your CPR performance was rated " + QString::number(cprQuality) + "/3");
+        if(cprQuality == 3){
+            updateTextbox("Keep up the good work!");
+        }else{
+            updateTextbox("Recall, for good CPR:");
+            updateTextbox("Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths.");
+            updateTextbox("Repeat the pattern twice, and then wait for AED assessment.");
+        }
+        updateTextbox("Analyzing patient...");
+
+        // Assessment of CPR cycle completed, now determine if a shock is necessary:
         if ((patient->getCondition() == 0) || (patient->getCondition() == 1)) {
             updateTextbox("AED Audio: Shock advised");
             ui->compressionButton->setEnabled(false);
             ui->breathButton->setEnabled(false);
             ui->shockButton->setEnabled(true);
         } else {
-            updateTextbox("AED Audio: Shock not advised, continue cpr");
+            updateTextbox("AED Audio: Shock not advised, continue CPR");
         }
-
     }
 }
 
@@ -419,8 +478,22 @@ void MainWindow::shock(){
         ui->compressionButton->setEnabled(true);
         ui->breathButton->setEnabled(true);
         ui->shockButton->setEnabled(false);
-        updateTextbox("AED Audio: Shock delivered, continue cpr");
+        updateTextbox("AED Audio: Shock delivered, continue CPR");
         battery = battery - 10;
+
+        int doShock = (QRandomGenerator::global()->generate() % 10); //0 to 9
+
+        qDebug() << "quality needs to pass" << doShock << "to fix heart rate";
+
+        if(cprQuality > doShock){
+            patient->setCondition(4);
+            updateECG();
+        }
+
+        numShocks++;
+        ui->batteryLabel->setText("Battery %: " + QString::number(battery));
+        ui->numShocksLabel->setText("Number of shocks: " + QString::number(numShocks));
+
     } else {
         updateTextbox("AED Audio: Battery low, shock not delivered");
         ui->compressionButton->setEnabled(true);

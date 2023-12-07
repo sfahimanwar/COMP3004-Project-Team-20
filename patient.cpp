@@ -86,3 +86,7 @@ int Patient::getCondition() {
 bool Patient::getQRS(){return QRS;}
 
 int Patient::getPStrength(){return pulseStrength;}
+
+void Patient::setCondition(int c){
+    patientCondition = c;
+}

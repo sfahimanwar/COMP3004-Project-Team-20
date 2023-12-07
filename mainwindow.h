@@ -5,11 +5,12 @@
 #include <aed.h>
 #include <patient.h>
 #include <QTimer>
+#include <QString>
 #include <string>
 #include <cstring>
 
-#define NUM_COMPRESSIONS 2
-#define NUM_BREATHS 1
+#define NUM_COMPRESSIONS 4
+#define NUM_BREATHS 2
 #define GOOD_CPR_PERCENT 0.2
 #define OK_CPR_PERCENT 0.1
 
@@ -30,11 +31,10 @@ private:
     QTimer minuteCounter;
     bool emsArrived;
     int numCompressions;
-    int CPRQuality;
-    bool isTouching;
-    std::string cprString = "";
-    int compressionsCount = 0;
-    int breathsCount = 0;
+    int cprQuality;
+    int numShocks;
+    QString cprString;
+    QString idealPattern;
     AED* aed;
     Patient* patient;
     Ui::MainWindow *ui;
