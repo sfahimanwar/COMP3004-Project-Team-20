@@ -191,6 +191,11 @@ void MainWindow::beginSimulation(){
     }
 
     patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing, q, pulseStrength);
+    if (ui->electrodes->currentText() == "T") {
+         aed = new AED(ui, patient, ui->batteryConfig->value(), true);
+    } else {
+        aed = new AED(ui, patient, ui->batteryConfig->value(), false);
+    }
 
     ui->userActionsFrame->setEnabled(true);
     ui->aedAudioFrame->setEnabled(true);
@@ -206,49 +211,9 @@ void MainWindow::updateTextbox(QString message){
     ui->aedText->append(message);
 }
 
-
-bool MainWindow::selfCheck() {
-    battery = ui->batteryConfig->value();
-
-    ui->batteryLabel->setText("Battery %: " + QString::number(battery));
-
-    if (battery == 0) {
-        updateTextbox("AED did not power on");
-        return false;
-    } else if (battery < 20) {
-        updateTextbox("AED Audio: Low Battery");
-        if(ui->electrodes->currentText() == "T"){
-            return true;
-        } else {
-            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
-            return false;
-        }
-        if(ui->electrodes->currentText() == "T"){
-            return true;
-        } else {
-            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
-            return false;
-        }
-    } else {
-        return true;
-    }
-}
-
-
 void MainWindow::powerOn(){
-    if (selfCheck()) {
-
-
-    updateTextbox("The AED has been powered on!");
-    updateTextbox("Check the responsiveness of the patient.");
-
-    ui->powerButton->setDisabled(true);
-    ui->responsivenessButton->setEnabled(true);
-
-    ui->okState->setChecked(true);
-    } else {
-
-    }
+    aed->powerButton();
+    ui->batteryLabel->setText("Remaining battery: " + QString::number(aed->getBattery()));
 }
 
 void MainWindow::checkResponse(){
@@ -277,13 +242,13 @@ void MainWindow::callEMS(){
 
     //Setting up minute counter (Displays in console how long until EMS arrives (10 second intervals)
     connect(&minuteCounter, &QTimer::timeout, [this]() { //Function is small so just put it inside of a lambda function
-        qDebug() << "Time until EMS arrives: " << (emsTimer.remainingTime()/1000) << "Seconds";
+//      qDebug() << "Time until EMS arrives: " << (emsTimer.remainingTime()/1000) << "Seconds";
         ui->emsTimeLabel->setText("Time until EMS arrives: " + QString::number(emsTimer.remainingTime()/1000) + " seconds");
         if(emsTimer.remainingTime()<=0){
             minuteCounter.stop();
         }
     });
-    minuteCounter.start(10000);
+    minuteCounter.start(1000);
 
     updateTextbox("Open the patient's airways.");
 
@@ -353,6 +318,8 @@ void MainWindow::applyPads(){
     bool electrode1 = ui->leftElectrode->isChecked();
     bool electrode2 = ui->rightElectrode->isChecked();
     if (electrode1 && electrode2){
+        aed->setPadsApplied(true);
+        aed->updateECG();
         updateTextbox("Both defibrillator pads are in now place. Move back, do not touch the patient!");
         ui->rightElectrode->setDisabled(true);
         ui->leftElectrode->setDisabled(true);
@@ -363,9 +330,10 @@ void MainWindow::applyPads(){
         ui->padState->setChecked(false);
         ui->noTouchState->setChecked(true);
 
-        updateECG();
+        //updateECG();
 
     }else{
+        aed->setPadsApplied(false);
         updateTextbox("Defibrillator pads not attached!");
     }
 }
@@ -474,32 +442,7 @@ void MainWindow::performCPR(){
 
 
 void MainWindow::shock(){
-    if (battery >= 10) {
-        ui->compressionButton->setEnabled(true);
-        ui->breathButton->setEnabled(true);
-        ui->shockButton->setEnabled(false);
-        updateTextbox("AED Audio: Shock delivered, continue CPR");
-        battery = battery - 10;
-
-        int doShock = (QRandomGenerator::global()->generate() % 10); //0 to 9
-
-        qDebug() << "quality needs to pass" << doShock << "to fix heart rate";
-
-        if(cprQuality > doShock){
-            patient->setCondition(4);
-            updateECG();
-        }
-
-        numShocks++;
-        ui->batteryLabel->setText("Battery %: " + QString::number(battery));
-        ui->numShocksLabel->setText("Number of shocks: " + QString::number(numShocks));
-
-    } else {
-        updateTextbox("AED Audio: Battery low, shock not delivered");
-        ui->compressionButton->setEnabled(true);
-        ui->breathButton->setEnabled(true);
-        ui->shockButton->setEnabled(false);
-    }
+   aed->shock(cprQuality);
 }
 
 void MainWindow::emsArrives(){
