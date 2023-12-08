@@ -5,6 +5,14 @@
 #include <aed.h>
 #include <patient.h>
 #include <QTimer>
+#include <QString>
+#include <string>
+#include <cstring>
+
+#define NUM_COMPRESSIONS 4
+#define NUM_BREATHS 2
+#define GOOD_CPR_PERCENT 0.2
+#define OK_CPR_PERCENT 0.1
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,17 +31,21 @@ private:
     QTimer minuteCounter;
     bool emsArrived;
     int numCompressions;
-    int CPRQuality;
-    bool isTouching;
+    int cprQuality;
+    int numShocks;
+    QString cprString;
+    QString idealPattern;
     AED* aed;
     Patient* patient;
     Ui::MainWindow *ui;
+    int battery;
     void updateTextbox(QString);
     void updateECG();
     void setHighButtons(); //Helper function to set proper buttons that should appear if heart rate is high
     void setNormalButtons(); //Helper function to set proper buttons that should appear if heart rate is within normal range
     void hideAll();
     void showAll();
+    bool selfCheck();
 
 private slots:
     void reset();

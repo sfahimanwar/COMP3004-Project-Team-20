@@ -30,6 +30,8 @@ public:
     bool getQRS();
     int getPStrength();
 
+    void setCondition(int);
+
 private:
     int patientCondition;
     //bodyType body;
