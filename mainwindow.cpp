@@ -139,6 +139,7 @@ void MainWindow::reset(){
     ui->rightElectrode->setDisabled(true);
 
     emsTimer.stop();    //TODO: KNOWN ISSUE: If the timer is going, and the user hits "reset," everything will reset correctly but after a few seconds the ems timer will update anyway and display 0.
+    numShocks=0;
 }
 
 
@@ -242,13 +243,13 @@ void MainWindow::callEMS(){
 
     //Setting up minute counter (Displays in console how long until EMS arrives (10 second intervals)
     connect(&minuteCounter, &QTimer::timeout, [this]() { //Function is small so just put it inside of a lambda function
-//      qDebug() << "Time until EMS arrives: " << (emsTimer.remainingTime()/1000) << "Seconds";
         ui->emsTimeLabel->setText("Time until EMS arrives: " + QString::number(emsTimer.remainingTime()/1000) + " seconds");
         if(emsTimer.remainingTime()<=0){
             minuteCounter.stop();
         }
     });
-    minuteCounter.start(1000);
+  
+    minuteCounter.start(1000); //Displaying every second
 
     updateTextbox("Open the patient's airways.");
 
