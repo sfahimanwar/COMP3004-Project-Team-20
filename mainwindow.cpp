@@ -139,6 +139,7 @@ void MainWindow::reset(){
     ui->rightElectrode->setDisabled(true);
 
     emsTimer.stop();    //TODO: KNOWN ISSUE: If the timer is going, and the user hits "reset," everything will reset correctly but after a few seconds the ems timer will update anyway and display 0.
+    numShocks=0;
 }
 
 
@@ -212,23 +213,17 @@ bool MainWindow::selfCheck() {
 
     ui->batteryLabel->setText("Battery %: " + QString::number(battery));
 
+    if(ui->electrodes->currentText() == "F"){
+        updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
+        return false;
+    }
+
     if (battery == 0) {
-        updateTextbox("AED did not power on");
+        updateTextbox("AED battery is depleted, cannot power on");
         return false;
     } else if (battery < 20) {
         updateTextbox("AED Audio: Low Battery");
-        if(ui->electrodes->currentText() == "T"){
-            return true;
-        } else {
-            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
-            return false;
-        }
-        if(ui->electrodes->currentText() == "T"){
-            return true;
-        } else {
-            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
-            return false;
-        }
+        return true;
     } else {
         return true;
     }
@@ -246,8 +241,6 @@ void MainWindow::powerOn(){
     ui->responsivenessButton->setEnabled(true);
 
     ui->okState->setChecked(true);
-    } else {
-
     }
 }
 
@@ -277,13 +270,12 @@ void MainWindow::callEMS(){
 
     //Setting up minute counter (Displays in console how long until EMS arrives (10 second intervals)
     connect(&minuteCounter, &QTimer::timeout, [this]() { //Function is small so just put it inside of a lambda function
-        qDebug() << "Time until EMS arrives: " << (emsTimer.remainingTime()/1000) << "Seconds";
         ui->emsTimeLabel->setText("Time until EMS arrives: " + QString::number(emsTimer.remainingTime()/1000) + " seconds");
         if(emsTimer.remainingTime()<=0){
             minuteCounter.stop();
         }
     });
-    minuteCounter.start(10000);
+    minuteCounter.start(1000); //Displaying every second
 
     updateTextbox("Open the patient's airways.");
 
