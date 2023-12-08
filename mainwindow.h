@@ -45,7 +45,6 @@ private:
     void setNormalButtons(); //Helper function to set proper buttons that should appear if heart rate is within normal range
     void hideAll();
     void showAll();
-    bool selfCheck();
 
 private slots:
     void reset();
