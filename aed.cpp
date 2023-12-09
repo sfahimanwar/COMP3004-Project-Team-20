@@ -84,7 +84,7 @@ void AED::resetShocks() {
 }
 
 void AED::powerButton() {
-    if (isOn == false) {
+    if (isOn == false) { //Turn the AED on if it's off, either resuming from a previous state or starting for the first time
         if (selfCheck()) {
             ui->aedText->clear();
             updateTextbox("AED: The AED has been powered on!");
@@ -97,7 +97,7 @@ void AED::powerButton() {
         } else {
             updateTextbox("AED: The AED is not usable");
         }
-    } else { //Turning off AED will make it restart from stage 1 (Change)
+    } else { //AED was on and is now powered off
         isOn = false;
         ui->aedText->clear();
         updateTextbox("AED: The AED has been powered off!");
@@ -127,19 +127,19 @@ void AED::shock(int cprQuality) {
                 ui->breathButton->setEnabled(false);
                 updateECG();
         }
-        else{
+        else{ //Shock didn't set patient to a normal rhythm
             int abnormalRhythm = (QRandomGenerator::global()->generate() % 100);
-            if(abnormalRhythm >= 0 && abnormalRhythm <48){
+            if(abnormalRhythm >= 0 && abnormalRhythm <48){ // 47/99 Chance to be VT
                 updateTextbox("AED: Shock delivered, Ventricular fibrillation detected continue CPR");
                 patient->setCondition(0);
                 updateECG();
             }
-            else if(abnormalRhythm >=48 && abnormalRhythm <97){
+            else if(abnormalRhythm >=48 && abnormalRhythm <97){ // 48/99 Chance to be VF
                 updateTextbox("AED: Shock delivered, Ventricular Tachycardia detected continue CPR");
                 patient->setCondition(1);
                 updateECG();
             }
-            else{
+            else{ // 4/99 Chance to be PEA (Might change to be higher, but it's boring and doesn't allow shocks)
                 updateTextbox("AED: Shock delivered, Pulseless Electrical Activity detected continue CPR");
                 patient->setCondition(2);
                 updateECG();
@@ -159,7 +159,7 @@ void AED::shock(int cprQuality) {
     }
 }
 
-int AED::assessPatient(){
+int AED::assessPatient(){ //Returns the condition of the patient (The one matching the displayed ECG)
     updateTextbox("AED: Analysing Patient...");
     updateECG();
     if(patient->getCondition()==0){

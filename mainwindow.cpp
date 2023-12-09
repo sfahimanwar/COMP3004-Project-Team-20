@@ -224,7 +224,7 @@ void MainWindow::beginSimulation(){
 void MainWindow::powerOn(){
     aed->powerButton();
     aed->displayBattery();
-    if(patient->getChecked()==false){
+    if(patient->getChecked()==false){ //If the AED gets turned off, we need a way of telling if was already at some previous state
        aed->updateTextbox("AED: Check the responsiveness of the patient.");
     }
     else{
@@ -269,7 +269,7 @@ void MainWindow::callEMS(){
     minuteCounter.start(1000); //Displaying every second
     ui->helpButton->setDisabled(true);
 
-    if(!patient->getResponsive()){
+    if(!patient->getResponsive()){ //Only going into further actions if the patient is unconscious, otherwise just wait for EMS
         aed->updateTextbox("AED: EMS has been called, and will be arriving shortly! Open the patient's airways.");
 
         ui->openAirwaysButton->setEnabled(true);
@@ -333,7 +333,7 @@ void MainWindow::applyPads(){
         ui->attachDefibButton->setDisabled(true);
         ui->disconnectElectrodes->setEnabled(true);
 
-        if(aed->assessPatient()==4){
+        if(aed->assessPatient()==4){ //In the case that the AED detects a normal Sinus rhythm, CPR should not be performed
             aed->updateTextbox("AED: DO NOT start CPR, continue waiting for EMS to arrive");
         }
         else{
@@ -366,6 +366,8 @@ void MainWindow::disconnectElectrode(){
         ui->leftElectrode->setChecked(false);
         ui->rightElectrode->setChecked(false);
     }
+
+    //Enabling / Disabling specific frames and buttons to return to the "Pad attachment" state
     ui->cprFrame->setEnabled(false);
     ui->attachDefibButton->setEnabled(true);
     ui->moveBackButton->setEnabled(false);
@@ -411,7 +413,7 @@ void MainWindow::performCPR(){
      *      ccccBBcBBcBB = quality 1/POOR (two extra breaths, not within acceptable wiggle room to be considered ok CPR)
      *      ccBBcBcBBBcc = quality 0/POOR (Missing middle and end breaths, too many breaths, too few compressions)
      *
-     *This CPR rating is then multiplied by a number between 0 and 1 and floored (This number comes from the depth of compression slider)
+     *This CPR rating is then multiplied by a number between 0 and 1 and floored (This number comes from the depth of compression slider: Left=No depth, Right=Full Proper Depth)
      *
      * If you want to "increase the realism" you can change NUMCOMPRESSIONS in mainwindow.h to 30 which is more accurate to real life, but a huge pain
      * since you gotta press the buttons 64 times per cycle. However, this function is designed to handle those changes, so if you love pressing buttons, you can.
