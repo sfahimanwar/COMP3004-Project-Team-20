@@ -9,18 +9,6 @@ public:
     Patient(int, int, bool, bool, bool, bool, bool, int);
     void receiveCPR();
     void receiveShock();
-    enum condition {
-      ventricularFibrillation,
-      ventricularTachycardia,
-      PEA,
-      Asystole,
-      None
-    };
-
-    enum bodyType {
-        normal,
-        child
-    };
 
     bool getIsEven();
     bool getSafeRange();
@@ -29,12 +17,13 @@ public:
     int getCondition();
     bool getQRS();
     int getPStrength();
+    bool getChecked();
 
     void setCondition(int);
+    void setChecked(bool);
 
 private:
     int patientCondition;
-    //bodyType body;
     int body;
     int pulse;
     bool isEven;
@@ -43,6 +32,7 @@ private:
     bool isBreathing;
     bool QRS;
     int pulseStrength;
+    bool isChecked;
 };
 
 #endif // PATIENT_H

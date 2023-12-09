@@ -42,22 +42,17 @@ void AED::updateTextbox(QString message){
 
 bool AED::selfCheck() {
     if (battery == 0) {
-        updateTextbox("AED did not power on");
+        updateTextbox("AED: AED did not power on");
         return false;
-    } else if (battery < 20) {
-        updateTextbox("AED Audio: Low Battery");
-        if(ui->electrodes->currentText() == "T"){
-            return true;
-        } else {
-            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
-            return false;
-        }
-        if(ui->electrodes->currentText() == "T"){
-            return true;
-        } else {
-            updateTextbox("AED Audio: Electodes missing or damaged, AED cannot function");
-            return false;
-        }
+    }
+    if(ui->electrodes->currentText() == "F"){
+        updateTextbox("AED: Electodes missing or damaged, AED cannot function");
+        return false;
+    }
+
+    if (battery < 20) {
+        updateTextbox("AED: Low Battery");
+        return true;
     } else {
         return true;
     }
@@ -91,19 +86,26 @@ void AED::resetShocks() {
 void AED::powerButton() {
     if (isOn == false) {
         if (selfCheck()) {
-            updateTextbox("The AED has been powered on!");
-            updateTextbox("Check the responsiveness of the patient.");
+            ui->aedText->clear();
+            updateTextbox("AED: The AED has been powered on!");
 
+            ui->userActionsFrame->setEnabled(true);
+            ui->aedDisplayFrame->setEnabled(true);
             ui->powerButton->setDisabled(true);
-            ui->responsivenessButton->setEnabled(true);
-
-            ui->okState->setChecked(true);
+            ui->powerOff->setEnabled(true);
             isOn = true;
         } else {
-            updateTextbox("The AED is not usable");
+            updateTextbox("AED: The AED is not usable");
         }
-    } else {
+    } else { //Turning off AED will make it restart from stage 1 (Change)
         isOn = false;
+        ui->aedText->clear();
+        updateTextbox("AED: The AED has been powered off!");
+        ui->powerOff->setEnabled(false);
+        ui->powerButton->setEnabled(true);
+
+        ui->aedDisplayFrame->setEnabled(false);
+        ui->userActionsFrame->setEnabled(false);
     }
 }
 
@@ -112,27 +114,77 @@ void AED::shock(int cprQuality) {
         ui->compressionButton->setEnabled(true);
         ui->breathButton->setEnabled(true);
         ui->shockButton->setEnabled(false);
-        updateTextbox("AED Audio: Shock delivered, continue CPR");
         battery = battery - 10;
 
         int doShock = (QRandomGenerator::global()->generate() % 10); //0 to 9
 
         qDebug() << "quality needs to pass" << doShock << "to fix heart rate";
 
-        if(cprQuality > doShock){
-            patient->setCondition(4);
-            updateECG();
+        if(cprQuality > doShock){ //It's possible that the shock doesn't just set the patient's rhythm to normal (Either to VF, VT Or even PEA)
+                updateTextbox("AED: Shock delivered, Sinus Rhytm detected STOP CPR and continue waiting for EMS to arrive");
+                patient->setCondition(4);
+                ui->compressionButton->setEnabled(false);
+                ui->breathButton->setEnabled(false);
+                updateECG();
+        }
+        else{
+            int abnormalRhythm = (QRandomGenerator::global()->generate() % 100);
+            if(abnormalRhythm >= 0 && abnormalRhythm <48){
+                updateTextbox("AED: Shock delivered, Ventricular fibrillation detected continue CPR");
+                patient->setCondition(0);
+                updateECG();
+            }
+            else if(abnormalRhythm >=48 && abnormalRhythm <97){
+                updateTextbox("AED: Shock delivered, Ventricular Tachycardia detected continue CPR");
+                patient->setCondition(1);
+                updateECG();
+            }
+            else{
+                updateTextbox("AED: Shock delivered, Pulseless Electrical Activity detected continue CPR");
+                patient->setCondition(2);
+                updateECG();
+            }
         }
 
         numShocks++;
         ui->batteryLabel->setText("Battery %: " + QString::number(battery));
         ui->numShocksLabel->setText("Number of shocks: " + QString::number(numShocks));
 
-    } else {
-        updateTextbox("AED Audio: Battery low, shock not delivered");
+        }
+    else {
+        updateTextbox("AED: Battery low, shock not delivered");
         ui->compressionButton->setEnabled(true);
         ui->breathButton->setEnabled(true);
         ui->shockButton->setEnabled(false);
     }
+}
+
+int AED::assessPatient(){
+    updateTextbox("AED: Analysing Patient...");
+    updateECG();
+    if(patient->getCondition()==0){
+        updateTextbox("AED: Patient's condition matches Ventricular fibrillation");
+        return 0;
+    }
+    else if(patient->getCondition()==1){
+        updateTextbox("AED: Patient's condition matches Ventricular Tachycardia");
+        return 1;
+    }
+    else if(patient->getCondition()==2){
+        updateTextbox("AED: Patient's condition matches Pulseless Electrical Activity");
+        return 2;
+    }
+    else if(patient->getCondition()==3){
+        updateTextbox("AED: Patient's condition matches an Asystole");
+        return 3;
+    }
+    else{
+        updateTextbox("AED: Patient's condition matches a Normal Sinus Rhythm");
+        return 4;
+    }
+}
+
+void AED::displayBattery(){
+    ui->batteryLabel->setText("Remaining battery: " + QString::number(getBattery()));
 }
 

@@ -9,6 +9,7 @@ Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool br
     isBreathing = breathing;
     QRS = qrs;
     pulseStrength = pStrength;
+    isChecked=false;
 
     //0 = VF
     //1 = VT
@@ -53,6 +54,14 @@ Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool br
         //VF = not even
 
         //Else = normal
+}
+
+void Patient::setChecked(bool state){
+    isChecked = state;
+}
+
+bool Patient::getChecked(){
+    return isChecked;
 }
 
 void Patient::receiveCPR(){

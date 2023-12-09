@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QRandomGenerator>
 #include <QLayout>
+#include <QtMath>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -12,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->aedDisplay->setPixmap(QPixmap(":/resources/img/aed.jpg"));
 
-    ui->pulseSetBox->setMaximum(600); // Apparently the highest heart rate ever recorded (A good upper bound).
+    ui->pulseSetBox->setMaximum(MAX_HEART_RATE); // Apparently the highest heart rate ever recorded (A good upper bound).
 
     //EMS Setup
     emsTimer.setSingleShot(true); // Timer will only fire once as EMS only needs to arrive just once
@@ -39,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->moveBackButton, SIGNAL(released()), this, SLOT(moveAway()));
     connect(ui->shockButton, SIGNAL(released()), this, SLOT(shock()));
     connect(ui->createPatientButton, SIGNAL(released()), this, SLOT(beginSimulation()));
+    connect(ui->powerOff, SIGNAL(released()), this, SLOT(powerOff()));
 
     // CPR buttons
     connect(ui->compressionButton, SIGNAL(released()), this, SLOT(performCPR()));
@@ -58,13 +60,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->attachDefibButton->setDisabled(true);
     ui->moveBackButton->setDisabled(true);
     ui->shockButton->setDisabled(true);
+    ui->safetyScenarioFrame->setDisabled(true);
 
 
     //EMS Related Connections
     connect(&emsTimer, SIGNAL(timeout()), this, SLOT(emsArrives()));
     //Need to add EMS reset button functionality, will combine with base reset functionality when complete.
-
-    updateTextbox("To begin using the AED, press the power button.");
 
     ui->userActionsFrame->setDisabled(true);
     ui->aedAudioFrame->setDisabled(true);
@@ -101,6 +102,10 @@ void MainWindow::reset(){
     ui->patientLabel->setPixmap(QPixmap()); // Reset patient image
     ui->ecgLabel->setPixmap(QPixmap());     // Reset ECG reading
 
+    //Enable CPR buttons (They won't show at first because it's frame is disabled)
+    ui->compressionButton->setEnabled(true);
+    ui->breathButton->setEnabled(true);
+
     // Disable all frames but the config
     ui->userActionsFrame->setDisabled(true);
     ui->aedAudioFrame->setDisabled(true);
@@ -110,6 +115,7 @@ void MainWindow::reset(){
     ui->ecgFrame->setDisabled(true);
     ui->configFrame->setEnabled(true);
     ui->infoFrame->setDisabled(true);
+    ui->safetyScenarioFrame->setDisabled(true);
 
     ui->emsTimeLabel->setText("Time until EMS arrives: --- seconds");
     ui->batteryLabel->setText("Remaining battery: ---");
@@ -138,8 +144,10 @@ void MainWindow::reset(){
     ui->rightElectrode->setChecked(false);
     ui->rightElectrode->setDisabled(true);
 
+    //Patient No longer checked for responsiveness
+    patient->setChecked(false);
+
     emsTimer.stop();    //TODO: KNOWN ISSUE: If the timer is going, and the user hits "reset," everything will reset correctly but after a few seconds the ems timer will update anyway and display 0.
-    numShocks=0;
 }
 
 
@@ -157,8 +165,10 @@ void MainWindow::beginSimulation(){
 
     ui->powerButton->setEnabled(true);
     ui->patientFrame->setEnabled(true);
-    ui->aedDisplayFrame->setEnabled(true);
+    ui->aedDisplayFrame->setEnabled(false);
     ui->infoFrame->setEnabled(true);
+    ui->responsivenessButton->setEnabled(true);
+    ui->okState->setChecked(true);
 
     if (ui->bodyBox->currentText() == "Child"){
         body = 1;
@@ -198,7 +208,8 @@ void MainWindow::beginSimulation(){
         aed = new AED(ui, patient, ui->batteryConfig->value(), false);
     }
 
-    ui->userActionsFrame->setEnabled(true);
+    ui->userActionsFrame->setEnabled(false);
+    ui->safetyScenarioFrame->setEnabled(true);
     ui->aedAudioFrame->setEnabled(true);
 
     qDebug() << "Created a patient with values body:" << body << "pulse:" << pulse << " pulseSafeRange" << pulseSafeRange << "regPulse:" << regPulse << "response:" << response << "breathing:" << breathing;
@@ -208,34 +219,38 @@ void MainWindow::beginSimulation(){
 
 }
 
-void MainWindow::updateTextbox(QString message){
-    ui->aedText->append(message);
-}
-
 void MainWindow::powerOn(){
     aed->powerButton();
-    ui->batteryLabel->setText("Remaining battery: " + QString::number(aed->getBattery()));
+    aed->displayBattery();
+    if(patient->getChecked()==false){
+       aed->updateTextbox("AED: Check the responsiveness of the patient.");
+    }
+    else{
+       aed->updateTextbox("AED: Previous Session Restored, please continue from the section displayed on the device");
+    }
+}
+
+void MainWindow::powerOff(){
+    aed->powerButton();
 }
 
 void MainWindow::checkResponse(){
+    patient->setChecked(true);
     bool response = patient->getResponsive();
     if (response){
-        updateTextbox("The patient is responsive--do NOT use the AED! Wait for help to arrive!");
-        //TODO: stuff here
+        aed->updateTextbox("AED: The patient is responsive--do NOT use the AED! Wait for help to arrive!");
     }else{
-        updateTextbox("The patient is unresponsive. Call for help and prepare to administer CPR.");
+        aed->updateTextbox("AED: The patient is unresponsive. Call for help and prepare to administer CPR.");
+    }
 
         ui->responsivenessButton->setDisabled(true);
         ui->helpButton->setEnabled(true);
 
         ui->okState->setChecked(false);
         ui->emergencyState->setChecked(true);
-    }
-
 }
 
 void MainWindow::callEMS(){
-    updateTextbox("EMS has been called, and will be arriving shortly!");
     int numMinutes = (QRandomGenerator::global()->generate() % 4)+ 2; // 2-5 minute wait time for EMS
     emsTimer.start(numMinutes*60000);
     ui->emsTimeLabel->setText("Time until EMS arrives: " + QString::number(emsTimer.remainingTime()/1000) + " seconds");
@@ -250,18 +265,23 @@ void MainWindow::callEMS(){
     });
   
     minuteCounter.start(1000); //Displaying every second
-
-    updateTextbox("Open the patient's airways.");
-
     ui->helpButton->setDisabled(true);
-    ui->openAirwaysButton->setEnabled(true);
 
-    ui->emergencyState->setChecked(false);
-    ui->airwayState->setChecked(true);
+    if(!patient->getResponsive()){
+        aed->updateTextbox("AED: EMS has been called, and will be arriving shortly! Open the patient's airways.");
+
+        ui->openAirwaysButton->setEnabled(true);
+
+        ui->emergencyState->setChecked(false);
+        ui->airwayState->setChecked(true);
+    }
+    else{
+        aed->updateTextbox("AED: EMS has been called, and will be arriving shortly!");
+    }
 }
 
 void MainWindow::openAirways(){
-    updateTextbox("The patient's airways have been opened, check if the patient is breathing.");
+    aed->updateTextbox("AED: The patient's airways have been opened, check if the patient is breathing.");
 
     ui->openAirwaysButton->setDisabled(true);
     ui->checkBreathingButton->setEnabled(true);
@@ -273,9 +293,9 @@ void MainWindow::openAirways(){
 
 void MainWindow::checkBreathing(){
     if(patient->getBreathing() == false){
-        updateTextbox("The patient is not breathing. Prepare to apply defibrilator pads. First, clear the patient's chest.");
+        aed->updateTextbox("AED: The patient is not breathing. Prepare to apply defibrilator pads. First, clear the patient's chest.");
     }else{
-        updateTextbox("The patient is breathing. TODO: SOMETHING HERE");
+        aed->updateTextbox("AED: The patient is breathing. TODO: SOMETHING HERE");
     }
     ui->checkBreathingButton->setDisabled(true);
     ui->openChestButton->setEnabled(true);
@@ -286,8 +306,7 @@ void MainWindow::checkBreathing(){
 }
 
 void MainWindow::clearChest(){
-    updateTextbox("Patient's chest has been cleared.");
-    updateTextbox("Attach the patient's defibrillator pads now.");
+    aed->updateTextbox("AED: Patient's chest has been cleared. Attach the patient's defibrillator pads now.");
 
     ui->rightElectrode->setEnabled(true);
     ui->leftElectrode->setEnabled(true);
@@ -300,50 +319,36 @@ void MainWindow::clearChest(){
 
 }
 
-void MainWindow::updateECG(){
-    int cond = patient->getCondition();
-     if (cond == 0) {
-         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/VF.png"));
-     } else if (cond == 1) {
-         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/VT.png"));
-     } else if (cond == 2) {
-         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/PEA.png"));
-     } else if (cond == 3) {
-         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/Asystole.png"));
-     } else {
-         ui->ecgLabel->setPixmap(QPixmap(":/resources/img/normal.png"));
-     }
-}
-
 void MainWindow::applyPads(){
     bool electrode1 = ui->leftElectrode->isChecked();
     bool electrode2 = ui->rightElectrode->isChecked();
     if (electrode1 && electrode2){
         aed->setPadsApplied(true);
-        aed->updateECG();
-        updateTextbox("Both defibrillator pads are in now place. Move back, do not touch the patient!");
+        aed->updateTextbox("AED: Both defibrillator pads are in now place. Move back, do not touch the patient!");
         ui->rightElectrode->setDisabled(true);
         ui->leftElectrode->setDisabled(true);
 
         ui->attachDefibButton->setDisabled(true);
-        ui->moveBackButton->setEnabled(true);
 
-        ui->padState->setChecked(false);
-        ui->noTouchState->setChecked(true);
+        if(aed->assessPatient()==4){
+            aed->updateTextbox("AED: DO NOT start CPR, continue waiting for EMS to arrive");
+        }
+        else{
+            ui->moveBackButton->setEnabled(true);
 
-        //updateECG();
+            ui->padState->setChecked(false);
+            ui->noTouchState->setChecked(true);
+        }
 
     }else{
         aed->setPadsApplied(false);
-        updateTextbox("Defibrillator pads not attached!");
+        aed->updateTextbox("AED: Defibrillator pads not attached!");
     }
 }
 
 void MainWindow::moveAway(){
-    updateTextbox("Prepare to administer CPR!");
-    updateTextbox("Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths.");
-    updateTextbox("Repeat the pattern twice, and then wait for AED assessment.");
-
+    aed->updateTextbox("AED: Prepare to administer CPR! Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths." + " Repeat the pattern twice, and then wait for AED assessment.");
+    aed->updateTextbox("AED: Also make sure to reach a full depth of 2.4 inches when compressing");
     ui->moveBackButton->setDisabled(true);
     ui->shockButton->setEnabled(true);
     ui->cprFrame->setEnabled(true);
@@ -374,6 +379,8 @@ void MainWindow::performCPR(){
      *      ccccBBcBcccB = quality 2/OKAY (correct number of breaths, missing breaths at the end)
      *      ccccBBcBBcBB = quality 1/POOR (two extra breaths, not within acceptable wiggle room to be considered ok CPR)
      *      ccBBcBcBBBcc = quality 0/POOR (Missing middle and end breaths, too many breaths, too few compressions)
+     *
+     *This CPR rating is then multiplied by a number between 0 and 1 and floored (This number comes from the depth of compression slider)
      *
      * If you want to "increase the realism" you can change NUMCOMPRESSIONS in mainwindow.h to 30 which is more accurate to real life, but a huge pain
      * since you gotta press the buttons 64 times per cycle. However, this function is designed to handle those changes, so if you love pressing buttons, you can.
@@ -415,28 +422,30 @@ void MainWindow::performCPR(){
             qDebug() << "gained 1 quality for acceptable breaths amount";
         }
 
+        cprQuality = qFloor((float)cprQuality * ((float)(ui->compressionSlider->value()+1))/(float)100); // Factoring in the slider
+
         qDebug() << "This round of CPR has a quality rating of" << cprQuality;
         cprString = "";
 
 
-        updateTextbox("Your CPR performance was rated " + QString::number(cprQuality) + "/3");
+        aed->updateTextbox("AED: Your CPR performance was rated " + QString::number(cprQuality) + "/3");
         if(cprQuality == 3){
-            updateTextbox("Keep up the good work!");
+            aed->updateTextbox("AED: Keep up the good work!");
         }else{
-            updateTextbox("Recall, for good CPR:");
-            updateTextbox("Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths.");
-            updateTextbox("Repeat the pattern twice, and then wait for AED assessment.");
+            aed->updateTextbox("AED: Recall, for good CPR: Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths." + " Repeat the pattern twice, and then wait for AED assessment.");
+            aed->updateTextbox("AED: Also make sure to reach a full depth of 2.4 inches when compressing");
         }
-        updateTextbox("Analyzing patient...");
+        int condition = aed->assessPatient();
 
         // Assessment of CPR cycle completed, now determine if a shock is necessary:
-        if ((patient->getCondition() == 0) || (patient->getCondition() == 1)) {
-            updateTextbox("AED Audio: Shock advised");
+        if ((condition == 0) || (condition == 1)) {
+            aed->updateTextbox("AED: Shock advised");
             ui->compressionButton->setEnabled(false);
             ui->breathButton->setEnabled(false);
             ui->shockButton->setEnabled(true);
-        } else {
-            updateTextbox("AED Audio: Shock not advised, continue CPR");
+        }
+        else {
+            aed->updateTextbox("AED: Shock not advised, continue CPR");
         }
     }
 }
@@ -467,7 +476,6 @@ void MainWindow::hideAll(){ // Helper function to just hide all elements that ar
     foreach(uiElement, ui->centralwidget->children()){
         QWidget* uiWidget = qobject_cast<QWidget*>(uiElement);
         if(uiWidget != nullptr){
-            qDebug() << uiWidget;
             uiWidget->hide();
         }
     }

@@ -17,6 +17,8 @@ public:
 
     void updateTextbox(QString);
     void updateECG();
+    int assessPatient();
+    void displayBattery();
 
     void shock(int);
 

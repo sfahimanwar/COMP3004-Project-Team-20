@@ -13,6 +13,7 @@
 #define NUM_BREATHS 2
 #define GOOD_CPR_PERCENT 0.2
 #define OK_CPR_PERCENT 0.1
+#define MAX_HEART_RATE 600
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,15 +33,11 @@ private:
     bool emsArrived;
     int numCompressions;
     int cprQuality;
-    int numShocks;
     QString cprString;
     QString idealPattern;
     AED* aed;
     Patient* patient;
     Ui::MainWindow *ui;
-    int battery;
-    void updateTextbox(QString);
-    void updateECG();
     void setHighButtons(); //Helper function to set proper buttons that should appear if heart rate is high
     void setNormalButtons(); //Helper function to set proper buttons that should appear if heart rate is within normal range
     void hideAll();
@@ -50,6 +47,7 @@ private slots:
     void reset();
     void beginSimulation();
     void powerOn();
+    void powerOff();
     void checkResponse();
     void callEMS();
     void openAirways();

@@ -57,7 +57,7 @@
      <rect>
       <x>30</x>
       <y>340</y>
-      <width>191</width>
+      <width>261</width>
       <height>17</height>
      </rect>
     </property>
@@ -68,7 +68,7 @@
      </font>
     </property>
     <property name="text">
-     <string>AED Audio Instructions</string>
+     <string>AED Audio / Display Instructions</string>
     </property>
    </widget>
    <widget class="QFrame" name="aedAudioFrame">
@@ -109,7 +109,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#000000;&quot;&gt;To begin using the AED, first set the patient and then press the power button.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -207,6 +207,9 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="maximum">
       <number>300</number>
+     </property>
+     <property name="value">
+      <number>60</number>
      </property>
     </widget>
     <widget class="QLabel" name="isPulseEvenLabel">
@@ -399,6 +402,9 @@ p, li { white-space: pre-wrap; }
      <property name="maximum">
       <number>100</number>
      </property>
+     <property name="value">
+      <number>100</number>
+     </property>
     </widget>
     <widget class="QLabel" name="pulseLabel_3">
      <property name="geometry">
@@ -491,7 +497,7 @@ p, li { white-space: pre-wrap; }
       <x>410</x>
       <y>230</y>
       <width>341</width>
-      <height>251</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -503,37 +509,11 @@ p, li { white-space: pre-wrap; }
     <property name="frameShadow">
      <enum>QFrame::Plain</enum>
     </property>
-    <widget class="QLabel" name="turnOnDeviceLabel">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>111</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Turn On Device:</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="powerButton">
-     <property name="geometry">
-      <rect>
-       <x>230</x>
-       <y>10</y>
-       <width>83</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>PWR ON</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="responsivenessLabel">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>10</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -546,7 +526,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>40</y>
+       <y>10</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -559,7 +539,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>70</y>
+       <y>40</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -572,7 +552,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>70</y>
+       <y>40</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -585,7 +565,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>160</y>
+       <y>130</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -598,7 +578,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>160</y>
+       <y>130</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -611,7 +591,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>160</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -624,7 +604,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>190</y>
+       <y>160</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -637,7 +617,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>220</y>
+       <y>190</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -650,7 +630,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>220</y>
+       <y>190</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -663,7 +643,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>100</y>
+       <y>70</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -676,7 +656,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>130</y>
+       <y>100</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -689,7 +669,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>100</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -702,7 +682,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>70</y>
        <width>171</width>
        <height>17</height>
       </rect>
@@ -716,7 +696,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>490</y>
+      <y>470</y>
       <width>191</width>
       <height>17</height>
      </rect>
@@ -735,9 +715,9 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>510</y>
+      <y>490</y>
       <width>341</width>
-      <height>91</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -786,6 +766,32 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>Shock!</string>
+     </property>
+    </widget>
+    <widget class="QSlider" name="compressionSlider">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>80</y>
+       <width>160</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="compressionDepthLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>161</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Depth of Compression:</string>
      </property>
     </widget>
    </widget>
@@ -1255,10 +1261,10 @@ color: rgb(255, 255, 255);</string>
      </font>
     </property>
     <property name="text">
-     <string>Safety Scenarios</string>
+     <string>Device Actions</string>
     </property>
    </widget>
-   <widget class="QFrame" name="userActionsFrame_2">
+   <widget class="QFrame" name="safetyScenarioFrame">
     <property name="geometry">
      <rect>
       <x>410</x>
@@ -1328,6 +1334,32 @@ color: rgb(255, 255, 255);</string>
       <string>PWR OFF</string>
      </property>
     </widget>
+    <widget class="QLabel" name="turnOnDeviceLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>111</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Turn On Device:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="powerButton">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>70</y>
+       <width>83</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PWR ON</string>
+     </property>
+    </widget>
    </widget>
    <zorder>aedDisplayFrame</zorder>
    <zorder>emsResetButton</zorder>
@@ -1350,7 +1382,7 @@ color: rgb(255, 255, 255);</string>
    <zorder>infoFrame</zorder>
    <zorder>emsArrivedLabel</zorder>
    <zorder>userActionsLabel_2</zorder>
-   <zorder>userActionsFrame_2</zorder>
+   <zorder>safetyScenarioFrame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
