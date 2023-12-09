@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->shockButton, SIGNAL(released()), this, SLOT(shock()));
     connect(ui->createPatientButton, SIGNAL(released()), this, SLOT(beginSimulation()));
     connect(ui->powerOff, SIGNAL(released()), this, SLOT(powerOff()));
+    connect(ui->disconnectElectrodes, SIGNAL(released()), this, SLOT(disconnectElectrode()));
 
     // CPR buttons
     connect(ui->compressionButton, SIGNAL(released()), this, SLOT(performCPR()));
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->moveBackButton->setDisabled(true);
     ui->shockButton->setDisabled(true);
     ui->safetyScenarioFrame->setDisabled(true);
+    ui->disconnectElectrodes->setDisabled(true);
 
 
     //EMS Related Connections
@@ -329,6 +331,7 @@ void MainWindow::applyPads(){
         ui->leftElectrode->setDisabled(true);
 
         ui->attachDefibButton->setDisabled(true);
+        ui->disconnectElectrodes->setEnabled(true);
 
         if(aed->assessPatient()==4){
             aed->updateTextbox("AED: DO NOT start CPR, continue waiting for EMS to arrive");
@@ -344,6 +347,34 @@ void MainWindow::applyPads(){
         aed->setPadsApplied(false);
         aed->updateTextbox("AED: Defibrillator pads not attached!");
     }
+}
+
+void MainWindow::disconnectElectrode(){
+    int disconnectOption = (QRandomGenerator::global()->generate() % 3); // 3 Options (0=Left pad disconnected, 1=Right pad Disconnected, 2=Both Disconnected)
+    ui->disconnectElectrodes->setDisabled(true);
+
+    if(disconnectOption==0){
+        aed->updateTextbox("AED: Left Defibrillator Pad has disconnected, please place back on patient.");
+        ui->leftElectrode->setChecked(false);
+    }
+    else if(disconnectOption==1){
+        aed->updateTextbox("AED: Right Defibrillator Pad has disconnected, please place back on patient.");
+        ui->rightElectrode->setChecked(false);
+    }
+    else{
+        aed->updateTextbox("AED: Both Left and Right Defibrillator Pads have disconnected, please place them back on patient.");
+        ui->leftElectrode->setChecked(false);
+        ui->rightElectrode->setChecked(false);
+    }
+    ui->cprFrame->setEnabled(false);
+    ui->attachDefibButton->setEnabled(true);
+    ui->moveBackButton->setEnabled(false);
+    ui->rightElectrode->setEnabled(true);
+    ui->leftElectrode->setEnabled(true);
+    ui->cprState->setChecked(false);
+    ui->noTouchState->setChecked(false);
+    ui->padState->setChecked(true);
+
 }
 
 void MainWindow::moveAway(){

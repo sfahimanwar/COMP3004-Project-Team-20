@@ -59,6 +59,7 @@ private slots:
     void performCPR();
     void emsArrives();
     void updateFromOther();
+    void disconnectElectrode();
 
 };
 #endif // MAINWINDOW_H
