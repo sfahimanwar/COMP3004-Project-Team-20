@@ -37,6 +37,7 @@ private:
     QString idealPattern;
     AED* aed;
     Patient* patient;
+    bool performingCPR;
     Ui::MainWindow *ui;
     void setHighButtons(); //Helper function to set proper buttons that should appear if heart rate is high
     void setNormalButtons(); //Helper function to set proper buttons that should appear if heart rate is within normal range

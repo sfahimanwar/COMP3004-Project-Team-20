@@ -148,6 +148,7 @@ void MainWindow::reset(){
 
     //Patient No longer checked for responsiveness
     patient->setChecked(false);
+    performingCPR = false;
 
     emsTimer.stop();    //TODO: KNOWN ISSUE: If the timer is going, and the user hits "reset," everything will reset correctly but after a few seconds the ems timer will update anyway and display 0.
 }
@@ -164,6 +165,7 @@ void MainWindow::beginSimulation(){
     bool breathing = false;
     bool q = false;
     int pulseStrength=0;
+    performingCPR = false;
 
     ui->powerButton->setEnabled(true);
     ui->patientFrame->setEnabled(true);
@@ -337,8 +339,11 @@ void MainWindow::applyPads(){
             aed->updateTextbox("AED: DO NOT start CPR, continue waiting for EMS to arrive");
         }
         else{
-            ui->moveBackButton->setEnabled(true);
-
+            aed->updateTextbox("AED: Prepare to administer CPR! Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths." + " Repeat the pattern twice, and then wait for AED assessment.");
+            aed->updateTextbox("AED: Also make sure to reach a full depth of 2.4 inches when compressing");
+            ui->moveBackButton->setDisabled(true);
+            ui->shockButton->setEnabled(false);
+            ui->cprFrame->setEnabled(true);
             ui->padState->setChecked(false);
             ui->noTouchState->setChecked(true);
         }
@@ -380,15 +385,21 @@ void MainWindow::disconnectElectrode(){
 }
 
 void MainWindow::moveAway(){
-    aed->updateTextbox("AED: Prepare to administer CPR! Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths." + " Repeat the pattern twice, and then wait for AED assessment.");
-    aed->updateTextbox("AED: Also make sure to reach a full depth of 2.4 inches when compressing");
-    ui->moveBackButton->setDisabled(true);
-    ui->shockButton->setEnabled(true);
-    ui->cprFrame->setEnabled(true);
+    if (performingCPR == false) {
+        aed->updateTextbox("AED: Prepare to administer CPR! Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths." + " Repeat the pattern twice, and then wait for AED assessment.");
+        aed->updateTextbox("AED: Also make sure to reach a full depth of 2.4 inches when compressing");
+        ui->moveBackButton->setDisabled(true);
+        ui->shockButton->setEnabled(true);
+        ui->cprFrame->setEnabled(true);
 
-    ui->noTouchState->setChecked(false);
-    ui->cprState->setChecked(true);
-    ui->shockButton->setEnabled(false);
+        ui->noTouchState->setChecked(false);
+        ui->cprState->setChecked(true);
+        ui->shockButton->setEnabled(false);
+    } else {
+        performingCPR = false;
+        ui->shockButton->setEnabled(true);
+        ui->moveBackButton->setEnabled(false);
+    }
 }
 
 
@@ -396,6 +407,7 @@ void MainWindow::performCPR(){
     int idealLength = 2*NUM_COMPRESSIONS + 2*NUM_BREATHS;
     int cprCycleLength = cprString.length();
     cprQuality = 0;
+    performingCPR = true;
 
     /* As the user performs CPR (presses the compression/breath) buttons, signals are sent to this function which are then used to build a QString called
      * cprString. When cprString's length is equal to idealLength, the CPR cycle is considered "finished," the patient can be analyzed, and feedback on
@@ -472,10 +484,10 @@ void MainWindow::performCPR(){
 
         // Assessment of CPR cycle completed, now determine if a shock is necessary:
         if ((condition == 0) || (condition == 1)) {
-            aed->updateTextbox("AED: Shock advised");
+            aed->updateTextbox("AED: Shock advised, please move away from patient");
             ui->compressionButton->setEnabled(false);
             ui->breathButton->setEnabled(false);
-            ui->shockButton->setEnabled(true);
+            ui->moveBackButton->setEnabled(true);
         }
         else {
             aed->updateTextbox("AED: Shock not advised, continue CPR");
