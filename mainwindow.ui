@@ -773,7 +773,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>170</x>
        <y>80</y>
-       <width>160</width>
+       <width>161</width>
        <height>16</height>
       </rect>
      </property>
@@ -792,6 +792,63 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>Depth of Compression:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>100</y>
+       <width>21</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>6</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>1.2In</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>100</y>
+       <width>21</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>6</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>2.4In</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>100</y>
+       <width>21</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>6</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>0.0In</string>
      </property>
     </widget>
    </widget>
