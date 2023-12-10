@@ -130,7 +130,7 @@ void MainWindow::reset(){ //To reset all the UI elements for another scenario
     // Disable all user action buttons
     QObject* uiElement;
     foreach(uiElement, ui->userActionsFrame->children()){
-        QWidget* uiWidget = qobject_cast<QWidget*>(uiElement);
+        QPushButton* uiWidget = qobject_cast<QPushButton*>(uiElement);
         if(uiWidget != nullptr){
             uiWidget->setDisabled(true);
         }
@@ -149,9 +149,8 @@ void MainWindow::reset(){ //To reset all the UI elements for another scenario
     ui->rightElectrode->setChecked(false);
     ui->rightElectrode->setDisabled(true);
 
-    //Patient No longer checked for responsiveness
+    //Patient No longer checked for responsiveness and no longer within CPR phase
     patient->setChecked(false);
-    performingCPR = false;
 
     emsTimer.stop();    //TODO: KNOWN ISSUE: If the timer is going, and the user hits "reset," everything will reset correctly but after a few seconds the ems timer will update anyway and display 0.
 }
@@ -168,8 +167,8 @@ void MainWindow::beginSimulation(){
     bool breathing = false;
     bool q = false;
     int pulseStrength=0;
-    performingCPR = false;
 
+    //Enabling starting frames and buttons
     ui->powerButton->setEnabled(true);
     ui->patientFrame->setEnabled(true);
     ui->aedDisplayFrame->setEnabled(false);
@@ -177,7 +176,7 @@ void MainWindow::beginSimulation(){
     ui->responsivenessButton->setEnabled(true);
     ui->okState->setChecked(true);
 
-    if (ui->bodyBox->currentText() == "Child"){
+    if (ui->bodyBox->currentText() == "Child"){ //Setting either adult or child model for display
         body = 1;
         ui->patientLabel->setPixmap(QPixmap(":/resources/img/child.jpg"));
     }else{
@@ -209,7 +208,7 @@ void MainWindow::beginSimulation(){
     }
 
     patient= new Patient(body, pulse, regPulse, pulseSafeRange, response, breathing, q, pulseStrength);
-    if (ui->electrodes->currentText() == "T") {
+    if (ui->electrodes->currentText() == "T") { //Decides whether or not to create an AED with malfunctioning electrodes (Malfunctioning covers anything from damaged to missing)
          aed = new AED(ui, patient, ui->batteryConfig->value(), true);
     } else {
         aed = new AED(ui, patient, ui->batteryConfig->value(), false);
@@ -229,10 +228,10 @@ void MainWindow::beginSimulation(){
 void MainWindow::powerOn(){
     aed->powerButton();
     aed->displayBattery();
-    if(aed->getState()==false){
+    if(aed->getState()==false){ //First checking if the AED is even able to be turned on (If not, we tell the user to follow standard first AID. This is an end case of sorts because the AED really won't be able to function without power)
        aed->updateTextbox("AED: Go about standard first aid procedures and CPR if patient is unconscious and not breathing");
     }
-    else if(patient->getChecked()==false){ //If the AED gets turned off, we need a way of telling if was already at some previous state
+    else if(patient->getChecked()==false){ //If the AED gets turned off, we need a way of telling if it was already at some previous state
        aed->updateTextbox("AED: Check the responsiveness of the patient.");
     }
     else{
@@ -255,6 +254,7 @@ void MainWindow::checkResponse(){
         aed->updateTextbox("AED: The patient is unresponsive. Call for help and prepare to administer CPR.");
     }
 
+        //Changing AED to "Help" state (Essentially enabling and disabling buttons changes the overall state the AED is in)
         ui->responsivenessButton->setDisabled(true);
         ui->helpButton->setEnabled(true);
 
@@ -282,7 +282,7 @@ void MainWindow::callEMS(){
     if(!patient->getResponsive()){ //Only going into further actions if the patient is unconscious, otherwise just wait for EMS
         aed->updateTextbox("AED: EMS has been called, and will be arriving shortly! Open the patient's airways.");
 
-        ui->openAirwaysButton->setEnabled(true);
+        ui->openAirwaysButton->setEnabled(true); //Changing to "Open airway" AED state
 
         ui->emergencyState->setChecked(false);
         ui->airwayState->setChecked(true);
@@ -296,7 +296,7 @@ void MainWindow::openAirways(){
     aed->updateTextbox("AED: The patient's airways have been opened, check if the patient is breathing.");
 
     ui->openAirwaysButton->setDisabled(true);
-    ui->checkBreathingButton->setEnabled(true);
+    ui->checkBreathingButton->setEnabled(true); //Changing to "Check Breathing" AED state
 
     ui->airwayState->setChecked(false);
     ui->breathState->setChecked(true);
@@ -307,10 +307,10 @@ void MainWindow::checkBreathing(){
     if(patient->getBreathing() == false){
         aed->updateTextbox("AED: The patient is not breathing. Prepare to apply defibrilator pads. First, clear the patient's chest.");
     }else{
-        aed->updateTextbox("AED: The patient is breathing. TODO: SOMETHING HERE");
+        aed->updateTextbox("AED: The patient is breathing. This is a good sign patient is NOT in cardiac arrest. However still apply defibrilator pads incase this changes. First, clear the patient's chest");
     }
     ui->checkBreathingButton->setDisabled(true);
-    ui->openChestButton->setEnabled(true);
+    ui->openChestButton->setEnabled(true); //Changing to "Clear Chest" AED State
 
     ui->breathState->setChecked(false);
     ui->padState->setChecked(true);
@@ -324,7 +324,7 @@ void MainWindow::clearChest(){
     ui->leftElectrode->setEnabled(true);
 
     ui->openChestButton->setDisabled(true);
-    ui->attachDefibButton->setEnabled(true);
+    ui->attachDefibButton->setEnabled(true); //Changing to "Attach pads" AED State
 
     ui->breathState->setChecked(false);
     ui->padState->setChecked(true);
@@ -334,13 +334,13 @@ void MainWindow::clearChest(){
 void MainWindow::applyPads(){
     bool electrode1 = ui->leftElectrode->isChecked();
     bool electrode2 = ui->rightElectrode->isChecked();
-    if (electrode1 && electrode2){
+    if (electrode1 && electrode2){ //Making sure both pads have been applied before moving to next state
         aed->setPadsApplied(true);
-        aed->updateTextbox("AED: Both defibrillator pads are in now place. Move back, do not touch the patient!");
-        ui->rightElectrode->setDisabled(true);
+        aed->updateTextbox("AED: Both defibrillator pads are in now place.");
+        ui->rightElectrode->setDisabled(true); //Making sure the user can't manually remove the electrode pads (Safety scenario button exists for that)
         ui->leftElectrode->setDisabled(true);
 
-        ui->attachDefibButton->setDisabled(true);
+        ui->attachDefibButton->setDisabled(true); //Changing to CPR AED state
         ui->disconnectElectrodes->setEnabled(true);
 
         if(aed->assessPatient()==4){ //In the case that the AED detects a normal Sinus rhythm, CPR should not be performed
@@ -353,11 +353,11 @@ void MainWindow::applyPads(){
             ui->padState->setChecked(false);
             ui->cprState->setChecked(true);
 
-            ui->compressionButton->setEnabled(true);
+            ui->compressionButton->setEnabled(true); //Always making sure to start with compressions / breaths before shocking
             ui->breathButton->setEnabled(true);
             ui->moveBackButton->setEnabled(false);
             ui->shockButton->setEnabled(false);
-            cprString = "";
+            cprString = ""; //Incase CPR got interuptted by a pad disconnection, reset the current built up string
         }
 
     }else{
@@ -395,34 +395,20 @@ void MainWindow::disconnectElectrode(){
 
 }
 
-void MainWindow::moveAway(){
-    if (performingCPR == false) {
-        aed->updateTextbox("AED: Prepare to administer CPR! Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths." + " Repeat the pattern twice, and then wait for AED assessment.");
-        aed->updateTextbox("AED: Also make sure to reach a full depth of 2.4 inches when compressing");
-        ui->moveBackButton->setDisabled(true);
-        ui->shockButton->setEnabled(true);
-        ui->cprFrame->setEnabled(true);
-
-        ui->noTouchState->setChecked(false);
-        ui->cprState->setChecked(true);
-        ui->shockButton->setEnabled(false);
-    } else {
-        performingCPR = false;
-        ui->shockButton->setEnabled(true);
-        ui->moveBackButton->setEnabled(false);
-    }
+void MainWindow::moveAway(){ //Simplified the "Clear" AED state. Used to need a variable keeping track of whether we were performing CPR but that is accounted for with button states
+    ui->shockButton->setEnabled(true); //Move AED to "Shock" state
+    ui->moveBackButton->setEnabled(false);
 }
 
 
 void MainWindow::performCPR(){
-    if(!aed->getState()){
+    if(!aed->getState()){ //If AED is off / has no more batteries then effectively do nothing (User is performing CPR, but AED cannot react to it)
         return;
     }
 
     int idealLength = 2*NUM_COMPRESSIONS + 2*NUM_BREATHS;
     int cprCycleLength = cprString.length();
     cprQuality = 0;
-    performingCPR = true;
 
     /* As the user performs CPR (presses the compression/breath) buttons, signals are sent to this function which are then used to build a QString called
      * cprString. When cprString's length is equal to idealLength, the CPR cycle is considered "finished," the patient can be analyzed, and feedback on
@@ -440,7 +426,7 @@ void MainWindow::performCPR(){
      *      ccccBBcBBcBB = quality 1/POOR (two extra breaths, not within acceptable wiggle room to be considered ok CPR)
      *      ccBBcBcBBBcc = quality 0/POOR (Missing middle and end breaths, too many breaths, too few compressions)
      *
-     *This CPR rating is then multiplied by a number between 0 and 1 and floored (This number comes from the depth of compression slider: Left=No depth, Right=Full Proper Depth)
+     * This CPR rating is then multiplied by a number between 0 and 1 and then floored (This number comes from the depth of compression slider: Left=No depth, Right=Full Proper Depth)
      *
      * If you want to "increase the realism" you can change NUMCOMPRESSIONS in mainwindow.h to 30 which is more accurate to real life, but a huge pain
      * since you gotta press the buttons 64 times per cycle. However, this function is designed to handle those changes, so if you love pressing buttons, you can.
@@ -498,11 +484,11 @@ void MainWindow::performCPR(){
         int condition = aed->assessPatient();
 
         // Assessment of CPR cycle completed, now determine if a shock is necessary:
-        if ((condition == 0) || (condition == 1)) {
+        if ((condition == 0) || (condition == 1)) { //Only shock on VT or VF
             aed->updateTextbox("AED: Shock advised, Stand Clear of Patient");
             ui->compressionButton->setEnabled(false);
             ui->breathButton->setEnabled(false);
-            ui->moveBackButton->setEnabled(true);
+            ui->moveBackButton->setEnabled(true); //AED entering "Clear" / "Move away from patient" state
             ui->cprState->setChecked(false);
             ui->noTouchState->setChecked(true);
         }
@@ -514,9 +500,6 @@ void MainWindow::performCPR(){
 
 
 void MainWindow::shock(){
-   if(!aed->getState()){
-       return;
-   }
    aed->shock(cprQuality);
 }
 
@@ -556,7 +539,7 @@ void MainWindow::showAll(){  // Helper function to show all elements
     }
 }
 
-void MainWindow::setHighButtons(){
+void MainWindow::setHighButtons(){ //Setting available buttons for when the heart rate is within the high range (>120)
     ui->pulseEvenBox->setEnabled(true);
     ui->responsivenessBox->setEnabled(true);
     ui->isBreathingBox->setEnabled(true);
@@ -574,7 +557,7 @@ void MainWindow::setHighButtons(){
         ui->hasQRSComplexBox->setDisabled(true);
         return;
     }
-    else{
+    else{ //If Pulse is normal enable the other options
         ui->pulseEvenBox->setEnabled(true);
         ui->responsivenessBox->setEnabled(true);
         ui->isBreathingBox->setEnabled(true);
@@ -590,7 +573,7 @@ void MainWindow::setHighButtons(){
         ui->hasQRSComplexBox->setCurrentIndex(1);
         ui->hasQRSComplexBox->setDisabled(true);
         return;
-    }
+    } //If pulse is even, enable the other options
     else{
         ui->pulseEvenBox->setEnabled(true);
         ui->responsivenessBox->setEnabled(true);
@@ -606,7 +589,7 @@ void MainWindow::setHighButtons(){
         ui->isBreathingBox->setDisabled(true);
         return;
     }
-    else{
+    else{ //If QRS complex is present, enable the other options
         ui->pulseEvenBox->setEnabled(true);
         ui->responsivenessBox->setEnabled(true);
         ui->isBreathingBox->setEnabled(true);
@@ -614,12 +597,12 @@ void MainWindow::setHighButtons(){
         ui->pulseStrengthBox->setEnabled(true);
     }
 
-    if(ui->isBreathingBox->currentText() == "F"){
+    if(ui->isBreathingBox->currentText() == "F"){ //Patient is not breathing, they are automatically unconscious (Or will be)
         ui->responsivenessBox->setCurrentIndex(1); //If patient is not breathing this implies they are unconscious
         ui->responsivenessBox->setDisabled(true);
         return;
     }
-    else{
+    else{ //If everything is true, the patient is in a stable condition just with a high heart rate
         ui->pulseEvenBox->setEnabled(true);
         ui->responsivenessBox->setEnabled(true);
         ui->isBreathingBox->setEnabled(true);
@@ -629,7 +612,7 @@ void MainWindow::setHighButtons(){
 
 }
 
-void MainWindow::setNormalButtons(){
+void MainWindow::setNormalButtons(){ //Setting available buttons for when the heart rate is within the normal range (31-119)
     ui->pulseEvenBox->setCurrentIndex(0); //Can't have a non-even pulse (VF) with a normal heart rate
     ui->pulseEvenBox->setDisabled(true);
     ui->responsivenessBox->setEnabled(true);
@@ -665,7 +648,7 @@ void MainWindow::setNormalButtons(){
 
 void MainWindow::updateFromOther(){ //Initial button availability is based on heart rate of patient
 
-    if(ui->pulseSetBox->value() == 0){ //If Heart Rate is flatlined
+    if(ui->pulseSetBox->value() <=30){ //If Heart Rate is flatlined (Around / Under 30 will flatline if left for a prolonged period of time, so it's assumed to be flatline)
         ui->pulseEvenBox->setCurrentIndex(0);
         ui->pulseEvenBox->setDisabled(true);
         ui->responsivenessBox->setCurrentIndex(1);
@@ -680,7 +663,7 @@ void MainWindow::updateFromOther(){ //Initial button availability is based on he
     else if(ui->pulseSetBox->value()>=120){ //If Heart Rate is 120 or over (Now possible for VF and VT)
         setHighButtons();
     }
-    else{ //Heart rate between 0 and 120 (VF and VT not possible (But Normal and PEA still possible))
+    else{ //Heart rate between 31 and 120 (VF and VT not possible (But Normal and PEA still possible))
         setNormalButtons();
     }
 }

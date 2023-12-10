@@ -20,7 +20,7 @@ AED::~AED() {
 
 }
 
-void AED::updateECG(){
+void AED::updateECG(){ //Updates the displayed ECG to the patient's current condition
     int cond = patient->getCondition();
      if (cond == 0) {
          ui->ecgLabel->setPixmap(QPixmap(":/resources/img/VF.png"));
@@ -54,10 +54,8 @@ bool AED::selfCheck() {
 
     if (battery < 20) {
         updateTextbox("AED: Low Battery");
-        return true;
-    } else {
-        return true;
     }
+    return true;
 }
 
 bool AED::getState(){
@@ -91,7 +89,7 @@ void AED::resetShocks() {
 
 void AED::powerButton() {
     if (isOn == false) { //Turn the AED on if it's off, either resuming from a previous state or starting for the first time
-        if (selfCheck()) {
+        if (selfCheck()) { // If AED passes the self check when powered on
             ui->aedText->clear();
             updateTextbox("AED: The AED has been powered on!");
             ui->userActionsFrame->setEnabled(true);
@@ -99,13 +97,13 @@ void AED::powerButton() {
             ui->powerButton->setDisabled(true);
             ui->powerOff->setEnabled(true);
             isOn = true;
-        } else {
+        } else { // AED failed self check
             updateTextbox("AED: The AED is not usable");
         }
     } else { //AED was on and is now powered off
         isOn = false;
         ui->aedText->clear();
-        ui->ecgLabel->setPixmap(QPixmap(""));
+        ui->ecgLabel->setPixmap(QPixmap("")); //ECG is turned off
         updateTextbox("AED: The AED has been powered off!");
         ui->powerOff->setEnabled(false);
         ui->powerButton->setEnabled(true);
@@ -116,7 +114,7 @@ void AED::powerButton() {
 }
 
 void AED::shock(int cprQuality) {
-    if (battery >= 10) {
+    if (battery >= 10) { //Only shock if battery is not within the low range (<=10)
         ui->compressionButton->setEnabled(true);
         ui->breathButton->setEnabled(true);
         ui->shockButton->setEnabled(false);

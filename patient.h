@@ -7,8 +7,6 @@ class Patient
 {
 public:
     Patient(int, int, bool, bool, bool, bool, bool, int);
-    void receiveCPR();
-    void receiveShock();
 
     bool getIsEven();
     bool getSafeRange();
