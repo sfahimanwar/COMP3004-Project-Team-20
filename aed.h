@@ -11,22 +11,25 @@ public:
     AED();
     AED(Ui::MainWindow*&, Patient*, int, bool);
     ~AED();
-    bool selfCheck();
+    bool selfCheck(); //Function to check AED's battery and status of defib pads before functioning like normal
 
     void powerButton();
 
     void updateTextbox(QString);
     void updateECG();
+    int assessPatient(); //Returns the patient's condition
+    void displayBattery();
 
     void shock(int);
 
     int getBattery();
     void setBattery(int);
 
-    bool getPadsApplied();
+    bool getPadsApplied(); //Returns whether or not both pads are applied to the patient
     void setPadsApplied(bool);
 
     int getNumShocks();
+    bool getState(); //Returns whether or not the AED is on
     void resetShocks();
 
 

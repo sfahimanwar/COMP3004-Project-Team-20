@@ -9,6 +9,7 @@ Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool br
     isBreathing = breathing;
     QRS = qrs;
     pulseStrength = pStrength;
+    isChecked=false;
 
     //0 = VF
     //1 = VT
@@ -16,8 +17,8 @@ Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool br
     //3 = Asystole
     //4 = Normal
 
-        // asystole (Pulse is 0, no heart rate)
-        if (pulse == 0) {
+        // asystole (Pulse is <=30, effectively no heart rate)
+        if (pulse <=30) {
             patientCondition = 3;
             return;
         }
@@ -46,21 +47,14 @@ Patient::Patient(int b, int p, bool even, bool safeRange, bool response, bool br
             return;
         }
 
-
-        //even pulse & under 120 = VT/PEA
-        //PEA has QRS (VT does not)
-
-        //VF = not even
-
-        //Else = normal
 }
 
-void Patient::receiveCPR(){
-    qDebug() << "In receiveCPR";
+void Patient::setChecked(bool state){
+    isChecked = state;
 }
 
-void Patient::receiveShock(){
-    qDebug() << "In receiveShock";
+bool Patient::getChecked(){
+    return isChecked;
 }
 
 bool Patient::getIsEven(){

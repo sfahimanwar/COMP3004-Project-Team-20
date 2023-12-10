@@ -13,6 +13,7 @@
 #define NUM_BREATHS 2
 #define GOOD_CPR_PERCENT 0.2
 #define OK_CPR_PERCENT 0.1
+#define MAX_HEART_RATE 600
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,20 +28,16 @@ public:
     ~MainWindow();
 
 private:
-    QTimer emsTimer;
-    QTimer minuteCounter;
+    QTimer emsTimer; //Timer that envokes the EMS end state after 2-5 minutes
+    QTimer minuteCounter; //Timer that updates the user on how long until EMS arrives (Updates every second)
     bool emsArrived;
     int numCompressions;
-    int cprQuality;
-    int numShocks;
-    QString cprString;
-    QString idealPattern;
+    int cprQuality; //Quality of CPR that ranges from 0-3
+    QString cprString; //Stores the pattern of compressions and breaths in one CPR cycle
+    QString idealPattern; //Stores the ideal pattern of compressions and breaths in one CPR cycle
     AED* aed;
     Patient* patient;
     Ui::MainWindow *ui;
-    int battery;
-    void updateTextbox(QString);
-    void updateECG();
     void setHighButtons(); //Helper function to set proper buttons that should appear if heart rate is high
     void setNormalButtons(); //Helper function to set proper buttons that should appear if heart rate is within normal range
     void hideAll();
@@ -50,6 +47,7 @@ private slots:
     void reset();
     void beginSimulation();
     void powerOn();
+    void powerOff();
     void checkResponse();
     void callEMS();
     void openAirways();
@@ -61,6 +59,7 @@ private slots:
     void performCPR();
     void emsArrives();
     void updateFromOther();
+    void disconnectElectrode();
 
 };
 #endif // MAINWINDOW_H
