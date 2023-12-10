@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     , emsArrived(false), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->aedDisplay->setPixmap(QPixmap(":/resources/img/aed.jpg"));
+    ui->aedDisplay->setPixmap(QPixmap(":/resources/img/aed.jpg")); //Populates the display with a diagram of the AED
 
     ui->pulseSetBox->setMaximum(MAX_HEART_RATE); // Apparently the highest heart rate ever recorded (A good upper bound).
 
@@ -61,15 +61,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->attachDefibButton->setDisabled(true);
     ui->moveBackButton->setDisabled(true);
     ui->shockButton->setDisabled(true);
-    ui->safetyScenarioFrame->setDisabled(true);
     ui->disconnectElectrodes->setDisabled(true);
+    ui->powerOff->setDisabled(true);
 
 
-    //EMS Related Connections
+    //EMS Related Connection
     connect(&emsTimer, SIGNAL(timeout()), this, SLOT(emsArrives()));
-    //Need to add EMS reset button functionality, will combine with base reset functionality when complete.
 
+    // Disables all frames, except for the config
     ui->userActionsFrame->setDisabled(true);
+    ui->safetyScenarioFrame->setDisabled(true);
     ui->aedAudioFrame->setDisabled(true);
     ui->aedDisplayFrame->setDisabled(true);
     ui->cprFrame->setDisabled(true);
@@ -82,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
     QString breaths('B');
     compressions = compressions.repeated(NUM_COMPRESSIONS);
     breaths = breaths.repeated(NUM_BREATHS);
-    idealPattern = compressions + breaths + compressions + breaths;
+    idealPattern = compressions + breaths + compressions + breaths; //Creating the ideal pattern of compressions and breaths to be used later during CPR
     qDebug() << "idealPattern:" << idealPattern;
 
 }
@@ -92,7 +93,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::reset(){
+void MainWindow::reset(){ //To reset all the UI elements for another scenario
     ui->aedText->clear();
     showAll();
 
@@ -118,6 +119,8 @@ void MainWindow::reset(){
     ui->configFrame->setEnabled(true);
     ui->infoFrame->setDisabled(true);
     ui->safetyScenarioFrame->setDisabled(true);
+    ui->powerOff->setEnabled(false);
+    ui->disconnectElectrodes->setEnabled(false);
 
     ui->emsTimeLabel->setText("Time until EMS arrives: --- seconds");
     ui->batteryLabel->setText("Remaining battery: ---");
@@ -226,7 +229,10 @@ void MainWindow::beginSimulation(){
 void MainWindow::powerOn(){
     aed->powerButton();
     aed->displayBattery();
-    if(patient->getChecked()==false){ //If the AED gets turned off, we need a way of telling if was already at some previous state
+    if(aed->getState()==false){
+       aed->updateTextbox("AED: Go about standard first aid procedures and CPR if patient is unconscious and not breathing");
+    }
+    else if(patient->getChecked()==false){ //If the AED gets turned off, we need a way of telling if was already at some previous state
        aed->updateTextbox("AED: Check the responsiveness of the patient.");
     }
     else{
@@ -241,9 +247,11 @@ void MainWindow::powerOff(){
 void MainWindow::checkResponse(){
     patient->setChecked(true);
     bool response = patient->getResponsive();
+
     if (response){
         aed->updateTextbox("AED: The patient is responsive--do NOT use the AED! Wait for help to arrive!");
-    }else{
+    }
+    else{
         aed->updateTextbox("AED: The patient is unresponsive. Call for help and prepare to administer CPR.");
     }
 
@@ -341,11 +349,15 @@ void MainWindow::applyPads(){
         else{
             aed->updateTextbox("AED: Prepare to administer CPR! Compress the patient's chest " + QString::number(NUM_COMPRESSIONS) + " times, followed by " + QString::number(NUM_BREATHS) + " breaths." + " Repeat the pattern twice, and then wait for AED assessment.");
             aed->updateTextbox("AED: Also make sure to reach a full depth of 2.4 inches when compressing");
-            ui->moveBackButton->setDisabled(true);
-            ui->shockButton->setEnabled(false);
             ui->cprFrame->setEnabled(true);
             ui->padState->setChecked(false);
-            ui->noTouchState->setChecked(true);
+            ui->cprState->setChecked(true);
+
+            ui->compressionButton->setEnabled(true);
+            ui->breathButton->setEnabled(true);
+            ui->moveBackButton->setEnabled(false);
+            ui->shockButton->setEnabled(false);
+            cprString = "";
         }
 
     }else{
@@ -375,7 +387,6 @@ void MainWindow::disconnectElectrode(){
     //Enabling / Disabling specific frames and buttons to return to the "Pad attachment" state
     ui->cprFrame->setEnabled(false);
     ui->attachDefibButton->setEnabled(true);
-    ui->moveBackButton->setEnabled(false);
     ui->rightElectrode->setEnabled(true);
     ui->leftElectrode->setEnabled(true);
     ui->cprState->setChecked(false);
@@ -404,6 +415,10 @@ void MainWindow::moveAway(){
 
 
 void MainWindow::performCPR(){
+    if(!aed->getState()){
+        return;
+    }
+
     int idealLength = 2*NUM_COMPRESSIONS + 2*NUM_BREATHS;
     int cprCycleLength = cprString.length();
     cprQuality = 0;
@@ -484,10 +499,12 @@ void MainWindow::performCPR(){
 
         // Assessment of CPR cycle completed, now determine if a shock is necessary:
         if ((condition == 0) || (condition == 1)) {
-            aed->updateTextbox("AED: Shock advised, please move away from patient");
+            aed->updateTextbox("AED: Shock advised, Stand Clear of Patient");
             ui->compressionButton->setEnabled(false);
             ui->breathButton->setEnabled(false);
             ui->moveBackButton->setEnabled(true);
+            ui->cprState->setChecked(false);
+            ui->noTouchState->setChecked(true);
         }
         else {
             aed->updateTextbox("AED: Shock not advised, continue CPR");
@@ -497,6 +514,9 @@ void MainWindow::performCPR(){
 
 
 void MainWindow::shock(){
+   if(!aed->getState()){
+       return;
+   }
    aed->shock(cprQuality);
 }
 

@@ -29,6 +29,7 @@ public:
     void setPadsApplied(bool);
 
     int getNumShocks();
+    bool getState();
     void resetShocks();
 
 

@@ -68,7 +68,7 @@
      </font>
     </property>
     <property name="text">
-     <string>AED Audio / Display Instructions</string>
+     <string>General Instructions</string>
     </property>
    </widget>
    <widget class="QFrame" name="aedAudioFrame">
@@ -497,7 +497,7 @@ p, li { white-space: pre-wrap; }
       <x>410</x>
       <y>230</y>
       <width>341</width>
-      <height>231</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -613,32 +613,6 @@ p, li { white-space: pre-wrap; }
       <string>Attach</string>
      </property>
     </widget>
-    <widget class="QLabel" name="movebackLabel">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>190</y>
-       <width>171</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Move Back:</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="moveBackButton">
-     <property name="geometry">
-      <rect>
-       <x>230</x>
-       <y>190</y>
-       <width>83</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Move</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="openAirwaysButton">
      <property name="geometry">
       <rect>
@@ -696,7 +670,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>470</y>
+      <y>430</y>
       <width>191</width>
       <height>17</height>
      </rect>
@@ -715,7 +689,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>490</y>
+      <y>450</y>
       <width>341</width>
       <height>121</height>
      </rect>
@@ -733,7 +707,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>20</y>
+       <y>10</y>
        <width>141</width>
        <height>25</height>
       </rect>
@@ -746,7 +720,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>20</y>
+       <y>10</y>
        <width>141</width>
        <height>25</height>
       </rect>
@@ -758,8 +732,8 @@ p, li { white-space: pre-wrap; }
     <widget class="QPushButton" name="shockButton">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>50</y>
+       <x>210</x>
+       <y>40</y>
        <width>83</width>
        <height>25</height>
       </rect>
@@ -849,6 +823,19 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>0.0In</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="moveBackButton">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>40</y>
+       <width>83</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clear</string>
      </property>
     </widget>
    </widget>

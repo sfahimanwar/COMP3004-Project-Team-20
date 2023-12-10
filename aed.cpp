@@ -43,10 +43,12 @@ void AED::updateTextbox(QString message){
 bool AED::selfCheck() {
     if (battery == 0) {
         updateTextbox("AED: AED did not power on");
+        isOn=false;
         return false;
     }
     if(ui->electrodes->currentText() == "F"){
         updateTextbox("AED: Electodes missing or damaged, AED cannot function");
+        isOn=false;
         return false;
     }
 
@@ -56,6 +58,10 @@ bool AED::selfCheck() {
     } else {
         return true;
     }
+}
+
+bool AED::getState(){
+    return isOn;
 }
 
 int AED::getBattery() {
@@ -88,7 +94,6 @@ void AED::powerButton() {
         if (selfCheck()) {
             ui->aedText->clear();
             updateTextbox("AED: The AED has been powered on!");
-
             ui->userActionsFrame->setEnabled(true);
             ui->aedDisplayFrame->setEnabled(true);
             ui->powerButton->setDisabled(true);
@@ -100,6 +105,7 @@ void AED::powerButton() {
     } else { //AED was on and is now powered off
         isOn = false;
         ui->aedText->clear();
+        ui->ecgLabel->setPixmap(QPixmap(""));
         updateTextbox("AED: The AED has been powered off!");
         ui->powerOff->setEnabled(false);
         ui->powerButton->setEnabled(true);
@@ -145,6 +151,15 @@ void AED::shock(int cprQuality) {
                 updateECG();
             }
         }
+        if(battery==0){
+            updateTextbox("AED: Battery has been depleted, continue CPR if abnormal rhythm was detected until EMS arrives!");
+            ui->powerOff->setEnabled(false);
+            ui->disconnectElectrodes->setEnabled(false);
+            ui->aedDisplayFrame->setEnabled(false);
+            ui->ecgLabel->setPixmap(QPixmap(""));
+            ui->userActionsFrame->setEnabled(false);
+            isOn=false;
+        }
 
         numShocks++;
         ui->batteryLabel->setText("Battery %: " + QString::number(battery));
@@ -157,6 +172,8 @@ void AED::shock(int cprQuality) {
         ui->breathButton->setEnabled(true);
         ui->shockButton->setEnabled(false);
     }
+    ui->cprState->setChecked(true);
+    ui->noTouchState->setChecked(false);
 }
 
 int AED::assessPatient(){ //Returns the condition of the patient (The one matching the displayed ECG)
