@@ -6,9 +6,9 @@ Evan MacDonald-Rycroft, 101193506
 Cameron Sparks, 101181932  
 Elizabeth (Levi) Kaganovsky, 101143853
 
-## What each member did? -  
+## What did each member do? -  
 
-## Organization of submission/project structure - 
+## Organization of submission - 
 Project Structure - 
 - Documentation - Folder containing all design documentation
     - UML Class Diagram.pdf
