@@ -3,7 +3,7 @@
 GitHub Repo Link - https://github.com/sfahimanwar/COMP3004-Project-Team-20 - TA needs to request repo owner to add to repo
 
 ## Team Members -  
-Sheikh Fahim Anwar, 101141744 (Repository Owner/Admin)
+Sheikh Fahim Anwar, 101141744 (Repository Owner/Admin)  
 Evan MacDonald-Rycroft, 101193506  
 Cameron Sparks, 101181932  
 Elizabeth (Levi) Kaganovsky, 101143853
