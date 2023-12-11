@@ -9,6 +9,7 @@ Cameron Sparks, 101181932
 Elizabeth (Levi) Kaganovsky, 101143853
 
 ## What did each member do? -  
+**Sheikh Fahim Anwar** - I was the owner and administrator of the GitHub repository bringing everyone up to speed on Git fundamentals and workflow, resolving conflicts for any large pull requests and merging them. I also took charge on managing the project, helping create issues on the issue board, creating a project board and moving the issues between different stages of progress and linking them to Pull Request so they'd close when the PR was merged, and taking point on the during our weekly standups. I also created the design documentation and files - UML Class Diagram, Traceability Matrix, Sequence Diagrams, State Diagrams and the README which included the textual explanation of the design decisions.
 
 ## Organization of submission - 
 Project Structure - 
@@ -35,5 +36,19 @@ Project Structure -
 - mainwindow.ui
   
 ## Design Decisions and Explanations -
+
+### Design Patterns and Main Classes
+
+For this AED simulator program, we had three main components/classes, the MainWindow which acted similarly to the Controller class allowing us to employ the Mediator pattern, which facilitated communication between the other two major classes AED and Patient classes, limiting their direct communication to a minimum. This also made program more modular allowing us to make code changes more easily without requiring major refactoring. It promoted loose coupling by keeping objects from referring to each other explicitly ( while it was not a pure Mediator pattern, we mostly stuck to this and deviated only when required), and it lets you vary their interaction independently. The Command pattern was also employed in our pattern as an effect of using the Qt C++ framework.
+
+We used the Patient class mostly just to encapsulate patient vitals and values, they in and of itself didn't have any functions apart from getters/setters and constructors. 
+
+There might be some similar/repeated functions between MainWindow and AED, in these cases it's a wrapper function invoking the function from the AED class. It was done to prevent bloating of the MainWindow class and prevent it from becoming too monolithic.
+
+The MainWindow class handles most of the interactions with the UI excpet for where AED needs to update its own values on the UI which is done directly by the AED class. The updates to the admin config and others are handled by the MainWindow.
+
+### Patient Conditions, Analysis and CPR Feedback
+
+### Other miscellaneous details
 
 
