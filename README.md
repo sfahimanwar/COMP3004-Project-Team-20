@@ -1,5 +1,7 @@
 # COMP3004 Team 20 Project Fall 2023
 
+GitHub Repo Link - https://github.com/sfahimanwar/COMP3004-Project-Team-20
+
 ## Team Members -  
 Sheikh Fahim Anwar, 101141744  
 Evan MacDonald-Rycroft, 101193506  
