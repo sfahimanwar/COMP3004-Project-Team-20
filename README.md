@@ -47,8 +47,44 @@ There might be some similar/repeated functions between MainWindow and AED, in th
 
 The MainWindow class handles most of the interactions with the UI excpet for where AED needs to update its own values on the UI which is done directly by the AED class. The updates to the admin config and others are handled by the MainWindow.
 
-### Patient Conditions, Analysis and CPR Feedback
+### Patient Conditions, Analysis and CPR Feedback  
+These are the possible patient conditions in the simulation - 
+- Ventricular Fibrillation - Fibrillation is when the pulse is NOT evenly spaced (Must have a high heart rate as well but this is enforced within mainwindow)
+- Ventricular Tachycardia - Tachycardia is when the pulse is evenly spaced but NO QRS complex is found (Must have a high heart rate as well but this is enforced within mainwindow
+- PEA (Pulseless Electrical Activity) - Heart pulse strength is very weak - Selected in 'Pulse Strength' in UI
+- Asystole - Pulse is <=30, effectively no heart rate
+- Normal Sinus Rhythm - When a QRS complex is found and the heart rate is normal and even
+
+### CPR Analysis and Feedback
+
+As the user performs CPR (presses the compression/breath) buttons, signals are sent to this function which are then used to build a QString called
+cprString. When cprString's length is equal to idealLength, the CPR cycle is considered "finished," the patient can be analyzed, and feedback on
+CPR is provided. CPR is rated as good/ok/poor as an integer from 0 to 3 depending on if the CPR meets the following conditions:  
+  - 2 breaths are administered in the middle and 2 at the end
+  - There is a reasonable number of compressions administered (NUMCOMPRESSIONS ±1)
+  - There is a reasonable number of breaths administered (NUMBREATHS ±1)
+     
+Examples:
+- ccccBBccccBB = quality 3/GOOD (Ideal)
+- cBccBBccccBB = quality 3/GOOD (extra breath, but within acceptable wiggle room to still be considered good CPR)
+- ccccBBcBcccB = quality 2/OKAY (correct number of breaths, missing breaths at the end)
+- ccccBBcBBcBB = quality 1/POOR (two extra breaths, not within acceptable wiggle room to be considered ok CPR)
+- ccBBcBcBBBcc = quality 0/POOR (Missing middle and end breaths, too many breaths, too few compressions)
+           
+This CPR rating is then multiplied by a number between 0 and 1 and then floored (This number comes from the depth of compression slider: Left=No depth, Right=Full Proper Depth)
+
+If you want to "increase the realism" you can change NUMCOMPRESSIONS in mainwindow.h to 30 which is more accurate to real life, but a huge pain
+since you gotta press the buttons 64 times per cycle. However, this function is designed to handle those changes, so if you love pressing buttons, you can.  
+
+After an assessment of CPR cycle is completed the AED determines if a shock is necessary and it allows shocks only on VT and VF conditions
 
 ### Other miscellaneous details
+
+AED Self Check - During AED self check, it checks battery level - if it's 0, it won't power on and if it's less than 20 it will provide a low battery warning. It will also check whether electrodes are ready.
+
+AED also loses 10% battery everytime a shock is applied, hence when battery is <= 10, it cannot apply a shock.  
+
+It's also possible that the shock applied by the AED doesn't just set the patient's rhythm to normal but either to VF, VT or even PEA.
+
 
 
