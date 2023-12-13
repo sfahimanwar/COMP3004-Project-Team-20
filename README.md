@@ -11,6 +11,8 @@ Elizabeth (Levi) Kaganovsky, 101143853
 ## What did each member do? -  
 **Sheikh Fahim Anwar** - I was the owner and administrator of the GitHub repository bringing everyone up to speed on Git fundamentals and workflow, resolving conflicts for any large pull requests and merging them. I also took charge on managing the project, helping create issues on the issue board, creating a project board and moving the issues between different stages of progress and linking them to Pull Request so they'd close when the PR was merged, and taking point on the during our weekly standups. I also created the design documentation and files - UML Class Diagram, Traceability Matrix, Sequence Diagrams, State Diagrams and the README which included the textual explanation of the design decisions.
 
+**Elizabeth (Levi) Kaganovsky** - I designed the initial GUI which was later implemented by Cameron and contributed code where required. I created the initial implementation of the user actions and AED instructions, as well as the full implementations of the reset button and CPR quality assessment function, and multiple other smaller features such as the AED display and user information display. I also recorded the demonstration videos based on the sequence diagrams.
+
 ## Organization of submission - 
 Project Structure - 
 - Documentation - Folder containing all design documentation
@@ -19,6 +21,7 @@ Project Structure -
     - Sequence Diagrams.pdf
     - Traceability Matrix.pdf
     - State Diagrams.pdf
+    - Demo Videos - Directory containing demo videos of the main 3 success and 3 safety scenarios from the sequence diagrams.
 - img - folder containing all images used in project (ECG diagrams for different conditions and patient images)
 - .gitignore - file used to prevent build and user machine specific files from being pushed to repo
 - COMP3004Project-Team20.pro - project settings created by Qt Creator, ensures parity in development experience between machines
