@@ -21,6 +21,7 @@ Project Structure -
     - Sequence Diagrams.pdf
     - Traceability Matrix.pdf
     - State Diagrams.pdf
+    - Demo Videos - Directory containing demo videos of the main 3 success and 3 safety scenarios from the sequence diagrams.
 - img - folder containing all images used in project (ECG diagrams for different conditions and patient images)
 - .gitignore - file used to prevent build and user machine specific files from being pushed to repo
 - COMP3004Project-Team20.pro - project settings created by Qt Creator, ensures parity in development experience between machines
